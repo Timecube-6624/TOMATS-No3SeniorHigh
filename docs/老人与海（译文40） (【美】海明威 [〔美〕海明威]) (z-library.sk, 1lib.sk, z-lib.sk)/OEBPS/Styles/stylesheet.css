@@ -1,0 +1,321 @@
+/* 内嵌字体 */
+@font-face {
+    font-family: "fangsong";
+    src: url("../Fonts/fangzhengfangsong.ttf");
+}
+
+@font-face {
+    font-family: "kai";
+    src: url("../Fonts/fangzhengkaiti.ttf");
+}
+/* 得到排版规范 */
+/* 段落标签 */
+p {
+    font-size: 1em;
+    line-height: 1.84;
+    text-align: justify;
+    margin: 0;
+    word-break: break-all;
+}
+
+/* 正文 */
+p.normaltext {
+    text-indent: 2em;
+}
+
+p.normaltext-1 {
+    margin-top: 100px;
+    text-indent: 2em;
+}
+
+
+
+
+/* 标题标签 */
+/* 一级标签” */
+h1 {
+    font-size: 1.4em;
+    line-height: 1.3;
+    margin: 100px 0 1em 0;
+    text-align: center;
+	color: #6196c5;
+}
+
+/* 二级标签 */
+h2 {
+    font-size: 1.22em;
+    line-height: 1.4;
+    margin: 2em 0 1em 0;
+    text-align: center;
+	color: #6196c5;
+}
+
+/* 三级标签 */
+
+h3 {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 1em 0 10px 0;
+	color:#6196c5;
+	border-left:5px #6196c5 solid;
+	padding-left:0.5em;
+}
+
+
+
+
+/* 四、五、六级标签 */
+h4, h5, h6 {
+    font-size: 1em;
+    line-height: 1.84;
+    margin: 10px 0 10px 0;
+    text-align: center;
+}
+
+/* 标题相接*/
+h1 + h2 {
+    margin-top: 0em;
+}
+
+h2 + h3 {
+    margin-top: 0em;
+}
+.center {
+font-weight:bold;
+	text-align:center;
+	text-indent:0em;
+    margin: 10px 0 0 0;
+}
+
+
+/* 图片名称 */
+.picname {
+    text-align: center;
+    font-family: kai;
+    text-indent: 0;
+    margin: 0 0 1em;
+}
+
+
+/* 图片居中1 */
+.tuzhu1 {
+    text-align: center;
+    font-family: fangsong;
+    text-indent: 0;
+    margin: .0 10px 1em;
+}
+
+
+/* 图片居中1 */
+.tuzhu2 {
+    text-align: center;
+    font-family: fangsong;
+    text-indent: 0;
+    margin: .0 10px 0em;
+}
+
+
+/* 图片说明 */
+.tuzhu3 {
+    font-family: fangsong;
+    margin:10px 10px 1em 10px;
+}
+
+
+div.picture img.normal-1 {
+   
+    margin:0px 0 0 0;
+}
+
+
+div.picture img.normal {
+    width: 80%;
+}
+
+div.picture img.long {
+    width: 30%;
+}
+
+
+
+
+
+/* 注释 */
+p.footnote {
+    text-indent: 2em;
+    margin: 10px 0 0 0;
+}
+
+span.note {
+    vertical-align: super;
+    font-size: 0.8em;
+    padding: 0 5px;
+}
+
+p.normaltext-right {
+    font-family: kai;
+    text-align: right;
+}
+
+p.poem {
+    font-family: fangsong;
+    text-align: center; 
+}
+
+div.blockquote{
+margin:1em 0em 1em 0em;
+}
+div.blockquote1{
+margin:1em 0em 0em 0em;
+}
+
+
+p.yinwen {
+    text-indent: 2em;
+    font-family: fangsong;
+}
+
+
+
+
+
+p.yinwen3 {
+    text-indent: 0;
+    font-family: fangsong;
+	text-align: left;
+}
+
+p.yinwen2 {
+font-weight:bold;
+    font-size: 1em;
+    line-height: 1.84;
+    margin: 0;
+    font-family: fangsong;
+	text-align: center;
+
+}
+
+.mt100 {
+    margin-top: 100px;
+}
+
+span.color {
+	color: #6196c5;
+}
+
+div.xuxian {
+	border: 1px dashed;
+	padding: 1em;
+}
+
+img.gongshi {
+	height: 1.0em;
+	vertical-align: middle;
+}
+
+span.bgcolor {
+	background-color:#6196c5;
+	padding:0 0.5em;
+	border-radius:1em;
+	color:#ffffff;
+}
+.right {
+	text-align: right;
+}
+
+
+
+/* 小” */
+span.xiao1 {
+    font-size: 0.8em;
+}
+
+
+span.xiao {
+	font-size: 0.8em;
+	color: #6196c5;
+	padding-left: 0.2em;
+	padding-right: 0.2em;
+}
+
+.xian {
+	border: 1px solid #6196c5;
+	padding: 0.3em;
+}
+
+.xian2 {
+	border: 1px solid #6196c5;
+	padding: 1.5em;
+}
+.fs{
+font-weight:bold;
+	padding:0em 0.2em;
+	border-radius:1em;
+}
+/* 斜体 */
+.italic{font-style:italic;}
+
+
+.yanse {
+	color:#6196c5;
+	font-weight:bold;
+	text-indent:2em;
+	font-size:1.0em;
+	line-height:200%;
+	}
+
+/*代码--------------------------------------*/
+.ziti1 {
+    font-family: fangsong;
+   font-size:1em;
+   margin-left:2em;
+   padding:0;
+   line-height:1.4em;
+ }
+
+
+/* 图片说明 */
+.tuzhu-center {
+    font-family: fangsong;
+    text-indent: 0;
+    text-align: center;
+}
+
+
+
+/* 图片说明 */
+.tuzhu {
+    font-family: fangsong;
+    text-indent: 0;
+}
+
+
+
+
+
+/* 图片居中 */
+div.picture {
+    text-align: center;
+
+}
+
+
+
+/* img 下面所有p 距10px */
+img + p{
+	margin:10px 10px 0 10px;
+}
+
+/* div.picture 下面 所有标签任意  */
+div.picture + *{
+	margin-top:1em;
+}
+/* 所有标签任意 下面 div.picture  */
+* + div.picture{
+	margin-top:1em;
+}
+div.picture + div.picture{
+	margin-top:0em;
+}
+
+

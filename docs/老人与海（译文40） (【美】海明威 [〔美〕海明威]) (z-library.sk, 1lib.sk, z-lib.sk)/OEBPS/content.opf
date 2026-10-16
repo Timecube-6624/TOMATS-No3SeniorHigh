@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package version="2.0" unique-identifier="BookId" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dc:title>老人与海（译文40）</dc:title>
+    <dc:creator opf:role="aut" opf:file-as="〔美〕海明威">【美】海明威</dc:creator>
+    <dc:publisher>上海译文出版社</dc:publisher>
+    <dc:date opf:event="modification">2019-03-04</dc:date>
+    <dc:language>zh-CN</dc:language>
+    <meta content="CoverDesign" name="coverpage" />
+    <meta content="0.8.5" name="Sigil version" />
+    <dc:identifier opf:scheme="ISBN">9787532777983</dc:identifier>
+    <dc:date opf:event="publication">2018-06-01</dc:date>
+    <meta content="" name="Magic version" />
+    <dc:identifier id="BookId">9787532751167</dc:identifier>
+    <meta name="cover" content="cover.jpg" />
+  </metadata>
+  <manifest>
+    <item id="chapter01.xhtml" href="Text/chapter01.xhtml" media-type="application/xhtml+xml"/>
+    <item id="chapter02.xhtml" href="Text/chapter02.xhtml" media-type="application/xhtml+xml"/>
+    <item id="chapter03.xhtml" href="Text/chapter03.xhtml" media-type="application/xhtml+xml"/>
+    <item id="Section0003.xhtml" href="Text/Section0003.xhtml" media-type="application/xhtml+xml"/>
+    <item id="toc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="styles" href="Styles/stylesheet.css" media-type="text/css"/>
+    <item id="img01-1" href="Images/01-1.png" media-type="image/png"/>
+    <item id="hemingway.jpg" href="Images/hemingway.jpg" media-type="image/jpeg"/>
+    <item id="cover.xhtml" href="Text/cover.xhtml" media-type="application/xhtml+xml"/>
+    <item id="Copyright.xhtml" href="Text/Copyright.xhtml" media-type="application/xhtml+xml"/>
+    <item id="fangzhengfangsong.ttf" href="Fonts/fangzhengfangsong.ttf" media-type="application/x-font-ttf"/>
+    <item id="fangzhengkaiti.ttf" href="Fonts/fangzhengkaiti.ttf" media-type="application/x-font-ttf"/>
+    <item id="cover.jpg" href="Images/cover.jpg" media-type="image/jpeg"/>
+    <item id="Section0002.xhtml" href="Text/Section0002.xhtml" media-type="application/xhtml+xml"/>
+    <item id="Section0004.xhtml" href="Text/Section0004.xhtml" media-type="application/xhtml+xml"/>
+    <item id="Section0001.xhtml" href="Text/Section0001.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine toc="toc">
+    <itemref idref="cover.xhtml"/>
+    <itemref idref="Copyright.xhtml"/>
+    <itemref idref="chapter01.xhtml"/>
+    <itemref idref="chapter02.xhtml"/>
+    <itemref idref="chapter03.xhtml"/>
+    <itemref idref="Section0004.xhtml"/>
+    <itemref idref="Section0002.xhtml"/>
+    <itemref idref="Section0001.xhtml"/>
+    <itemref idref="Section0003.xhtml"/>
+  </spine>
+  <guide>
+    <reference type="cover" title="Cover" href="Text/cover.xhtml"/>
+  </guide>
+</package>
