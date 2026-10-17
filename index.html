@@ -100,6 +100,366 @@
         .status-warning {
             color: #FFC107; /* 黄色 */
         }
+
+        /* ====== 最后一页：微弱的晨光 + 一副漂浮的白色鱼骨架 ====== */
+        .final-scene {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 晨光：从黑暗中缓缓浮现，始终极弱 */
+        .dawn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* 未进入本页时不可见 */
+        }
+        .dawn svg { display: block; width: 100%; height: 100%; }
+        /* 只在“本页处于激活状态”时播放，返回再进入会自动重播 */
+        .slide.active .dawn {
+            -webkit-animation: dawnIn 4.2s ease-out 0.25s forwards;
+            animation: dawnIn 4.2s ease-out 0.25s forwards;
+        }
+
+        /* 骨架：在黑暗中极缓慢地漂浮 */
+        .drift {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .drift svg { display: block; width: 90%; height: auto; }
+        .slide.active .drift {
+            -webkit-animation: driftFloat 11s ease-in-out infinite alternate;
+            animation: driftFloat 11s ease-in-out infinite alternate;
+        }
+
+        @-webkit-keyframes dawnIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes dawnIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @-webkit-keyframes driftFloat {
+            from { -webkit-transform: translateY(6px) rotate(-0.4deg); }
+            to   { -webkit-transform: translateY(-8px) rotate(0.5deg); }
+        }
+        @keyframes driftFloat {
+            from { transform: translateY(6px) rotate(-0.4deg); }
+            to   { transform: translateY(-8px) rotate(0.5deg); }
+        }
+
+        /* ====== 第一页：风暴中的老人 ======
+           画面按 Background.png 的原始比例(2304x1728)做成舞台，
+           这样“闭眼”贴片可以直接用画面像素坐标摆放，不会随窗口比例漂移。 */
+        .cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        /* 整幅画面像货轮驾驶室那样晃：绕镜头轴横摇(roll) + 上下垂荡(heave)。
+           两层套着做，各有各的周期（15s / 9s）—— 叠起来不会像单一正弦那样呆板，
+           45 秒才重合一次，接近真船的复合摇摆。
+           横摇要吃掉画面四角，所以舞台放大 6%（各边约 3vw 出血）；按最紧的
+           4:3 窗口算，1.2° 横摇 + 0.5% 垂荡只需要 1.038 倍，留了 2% 余量。 */
+        .rock, .heave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        /* 横摇：正负 1.2°，像船在涌浪里左右倾 */
+        .slide.active .rock {
+            -webkit-animation: coverRoll 10s ease-in-out infinite alternate;
+            animation: coverRoll 10s ease-in-out infinite alternate;
+        }
+        /* 垂荡：正负 0.5% 视口高度，配合横摇给出实感 */
+        .slide.active .heave {
+            -webkit-animation: coverHeave 6s ease-in-out infinite alternate;
+            animation: coverHeave 6s ease-in-out infinite alternate;
+        }
+        @-webkit-keyframes coverRoll {
+            from { -webkit-transform: translate3d(0, 0, 0) rotate(-1.2deg); }
+            to   { -webkit-transform: translate3d(0, 0, 0) rotate(1.2deg); }
+        }
+        @keyframes coverRoll {
+            from { transform: translate3d(0, 0, 0) rotate(-1.2deg); }
+            to   { transform: translate3d(0, 0, 0) rotate(1.2deg); }
+        }
+        @-webkit-keyframes coverHeave {
+            from { -webkit-transform: translate3d(0, 0.5%, 0); }
+            to   { -webkit-transform: translate3d(0, -0.5%, 0); }
+        }
+        @keyframes coverHeave {
+            from { transform: translate3d(0, 0.5%, 0); }
+            to   { transform: translate3d(0, -0.5%, 0); }
+        }
+
+        .stage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 106vw;
+            height: 79.5vw;        /* 4:3；配合下面两行 min-* 变成 cover 铺满（已含 6% 摇摆余量） */
+            min-width: 141.3333vh;
+            min-height: 106vh;
+            transform: translate(-50%, -50%);
+        }
+        .stage img, .stage div { position: absolute; }
+        .cover-art {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        /* WebGL 海面画布，压在原画之上、闭眼贴片之下 */
+        .cover-gl {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* ====== PPT 第 1 页那块「柔边模糊」======
+           PPT 里是一张已模糊的同款画（image2.png）+ softEdge 990600EMU，
+           摆在 slide 的 (3.177%, 10.948%)、大小 57.76% x 76.48%，
+           取自原画 (2.872%, 23.525%) 起、52.213% x 51.852% 那一块 —— 1:1 不拉伸。
+           这里不另存图片：直接再贴一次 Background.png，用 filter: blur 做模糊、
+           用径向遮罩做柔边，省掉 1.6MB 素材，效果一样。
+           它在 .stage 里，所以跟着画一起摇 —— 文字不摇，糊的背景摇。 */
+        .cover-blur {
+            position: absolute;
+            left: 2.872%;
+            top: 23.525%;
+            width: 52.213%;
+            height: 51.852%;
+            -webkit-filter: blur(1.5vw);
+            filter: blur(1.5vw);
+            -webkit-mask-image: radial-gradient(closest-side, rgba(0,0,0,1) 42%, rgba(0,0,0,0) 100%);
+            -webkit-mask-size: 100% 100%;
+            -webkit-mask-repeat: no-repeat;
+            mask-image: radial-gradient(closest-side, rgba(0,0,0,1) 42%, rgba(0,0,0,0) 100%);
+            mask-size: 100% 100%;
+            mask-repeat: no-repeat;
+        }
+        /* 同一张画、同一比例：把原画放大到和舞台 1:1，再平移出要取的那块 */
+        .cover-blur img {
+            left: -5.5012%;
+            top: -45.370%;
+            width: 191.524%;
+            height: 192.858%;
+        }
+
+        /* ---- 海面：三层「远/中/近」----
+           画里左侧浪脊近水平、向右上收敛，巨浪自右侧卷下，所以水整体流向左下。
+           三层尺寸由小到大、速度由慢到快 → 透视缩放 + 运动视差，产生纵深。
+           每层位移正好一个贴图块，循环处无缝；用 transform 而非 background-position，
+           是为了交给合成器，老旧一体机上不掉帧。
+           三层外面再包一个 .cover-waves，用 man-mask.png 把老人挖掉：
+           水只在人的后面走，不会盖到他身上。
+           （man-mask.png 由 tools/make-man-mask.ps1 从 OldMan-Body.png 生成） */
+        .cover-waves {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-mask-image: url("assets/man-mask.png");
+            -webkit-mask-size: 100% 100%;
+            -webkit-mask-position: 0 0;
+            -webkit-mask-repeat: no-repeat;
+            mask-image: url("assets/man-mask.png");
+            mask-size: 100% 100%;
+            mask-position: 0 0;
+            mask-repeat: no-repeat;
+        }
+        .cover-water {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .cover-water i {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            display: block;
+            background-image: url("assets/water-foam.png");
+            background-repeat: repeat;
+            will-change: transform;
+        }
+
+        /* 远：浪纹最细、最慢，压在地平线附近 */
+        .w-far {
+            opacity: 0.10;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 29%, rgba(0,0,0,.9) 41%, rgba(0,0,0,0) 55%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 29%, rgba(0,0,0,.9) 41%, rgba(0,0,0,0) 55%);
+        }
+        .w-far i { background-size: 208px 80px; }
+        .slide.active .w-far i {
+            -webkit-animation: waterFar 48s linear infinite;
+            animation: waterFar 48s linear infinite;
+        }
+
+        /* 中：主海面 */
+        .w-mid {
+            opacity: 0.13;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 37%, rgba(0,0,0,.9) 55%, rgba(0,0,0,0) 74%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 37%, rgba(0,0,0,.9) 55%, rgba(0,0,0,0) 74%);
+        }
+        .w-mid i { background-size: 390px 150px; }
+        .slide.active .w-mid i {
+            -webkit-animation: waterMid 30s linear infinite;
+            animation: waterMid 30s linear infinite;
+        }
+
+        /* 近：浪纹最大、最快，压在画面最前 */
+        .w-near {
+            opacity: 0.16;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 52%, rgba(0,0,0,.9) 70%, #000 90%, rgba(0,0,0,.55) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 52%, rgba(0,0,0,.9) 70%, #000 90%, rgba(0,0,0,.55) 100%);
+        }
+        .w-near i { background-size: 650px 250px; }
+        .slide.active .w-near i {
+            -webkit-animation: waterNear 19s linear infinite;
+            animation: waterNear 19s linear infinite;
+        }
+
+        /* 三层斜率一致(≈21°)，朝左下流动 */
+        @-webkit-keyframes waterFar  { from { -webkit-transform: translate3d(0,0,0); } to { -webkit-transform: translate3d(-208px, 80px, 0); } }
+        @keyframes        waterFar  { from { transform: translate3d(0,0,0); } to { transform: translate3d(-208px, 80px, 0); } }
+        @-webkit-keyframes waterMid  { from { -webkit-transform: translate3d(0,0,0); } to { -webkit-transform: translate3d(-390px, 150px, 0); } }
+        @keyframes        waterMid  { from { transform: translate3d(0,0,0); } to { transform: translate3d(-390px, 150px, 0); } }
+        @-webkit-keyframes waterNear { from { -webkit-transform: translate3d(0,0,0); } to { -webkit-transform: translate3d(-650px, 250px, 0); } }
+        @keyframes        waterNear { from { transform: translate3d(0,0,0); } to { transform: translate3d(-650px, 250px, 0); } }
+
+        /* 闭眼贴片：按实测眼位对位（旋转 2.456°，与画面 1:1） */
+        .cover-eyes {
+            left: 47.3557%;
+            top: 34.5251%;
+            width: 7.6492%;
+            height: auto;
+            transform-origin: 0 0;
+            transform: rotate(2.456deg);
+            opacity: 0;
+        }
+        /* 一直眨，直到翻页；翻走再回来会自动重播 */
+        .slide.active .cover-eyes {
+            -webkit-animation: blink 6s linear infinite;
+            animation: blink 6s linear infinite;
+        }
+        /* 6s 一轮：睁眼 5s → 瞬间闭眼 → 闭 1s → 瞬间睁开。
+           眨眼是「一闭一开」的硬切，不该有淡入淡出，
+           所以两个关键帧贴着写（83.33% → 83.34%），过渡只有 6ms，肉眼看就是瞬间。
+           想调闭眼时长，改 83.33% 这个点：闭眼占比 = 100% - 该值。 */
+        @-webkit-keyframes blink {
+            0%,     83.33% { opacity: 0; }
+            83.34%, 100%   { opacity: 1; }
+        }
+        @keyframes blink {
+            0%,     83.33% { opacity: 0; }
+            83.34%, 100%   { opacity: 1; }
+        }
+
+        /* ====== 封面标题：照 docs/TOMATS.pptx 第 1 页的排版 ======
+           PPT 版面 12192000x6858000(16:9)，文字坐标直接按 16:9 版面取：
+             · The Old Man and the Sea  36pt 左 5.41% 顶 31.3%
+             · 老人与海                  60pt
+             · 作者行                    16pt 顶 57.18%（标题块到作者行 24.5pt）
+           PPT 在 1280 宽下是 96dpi，故 1pt = 1.3333px = 0.10417vw：
+             36pt=3.75vw  60pt=6.25vw  16pt=1.67vw  24.5pt=2.55vw
+           颜色 bg1 lumMod 95% → #f2f2f2。
+           ⚠ 标题是 .cover 的直接子元素，不在 .rock/.heave 里 —— 文字不跟着船摇，
+             只有升起动画；摇晃的是它背后的画。
+           （注意：HTML 里用 div 而不是 p，避免命中文件顶部那条
+             p{font-size:4vw;color:#aaa;text-align:center} 的全局规则。） */
+        .cover-title {
+            position: absolute;
+            left: 5.41%;
+            top: 31.3%;
+            width: 62%;
+            color: #f2f2f2;
+            text-align: left;
+            pointer-events: none;
+        }
+        .cover-title div { text-align: left; color: #f2f2f2; }
+        .cover-title .ct-en {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, "Microsoft YaHei", sans-serif;
+            font-size: 3.75vw;
+            line-height: 1.2;
+            letter-spacing: 0.005em;
+            white-space: nowrap;
+        }
+        .cover-title .ct-zh {
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-weight: 800;
+            font-size: 6.25vw;
+            line-height: 1.2;
+            letter-spacing: 0.012em;
+            white-space: nowrap;
+        }
+        .cover-title .ct-au {
+            margin-top: 2.55vw;          /* = PPT 里标题块到作者行的 24.5pt */
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, "Microsoft YaHei", sans-serif;
+            font-size: 1.67vw;
+            line-height: 1.35;
+            color: #ececec;
+            white-space: nowrap;
+        }
+        .cover-title .ct-au2 {
+            font-family: "MiSans Demibold", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 1.67vw;
+            line-height: 1.45;
+            color: #ececec;
+            white-space: nowrap;
+        }
+        .cover-title .brk { font-size: 0.875em; }   /* PPT 里的 [ ] 是 14pt，字是 16pt */
+
+        /* 逐词遮罩升起：.wd 是那层 overflow:hidden，里面的 i 从下方 110% 升到 0。
+           注意 i 的基础状态是“已就位”——没动画时文字是正常显示的；
+           隐藏只由关键帧的 from + animation-fill-mode:both 负责，
+           这样翻走时标题不会在整页淡出的过程中提前消失。 */
+        .wd {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: bottom;
+            padding-bottom: 0.1em;
+            margin-bottom: -0.1em;   /* 补回 padding，不撑行高 */
+        }
+        .wd > i {
+            display: inline-block;
+            font-style: normal;
+        }
+        .cover-ready .slide.active .wd > i {
+            -webkit-animation: wordRise 0.95s cubic-bezier(0.25, 1, 0.5, 1) both;
+            animation: wordRise 0.95s cubic-bezier(0.25, 1, 0.5, 1) both;
+        }
+        @-webkit-keyframes wordRise {
+            from { -webkit-transform: translateY(110%); }
+            to   { -webkit-transform: translateY(0); }
+        }
+        @keyframes wordRise {
+            from { transform: translateY(110%); }
+            to   { transform: translateY(0); }
+        }
+
+        /* 封面与尾页：不留状态栏和触控提示 */
+        body.is-clean #status-bar { display: none; }
+        body.is-clean #zone-top { background: none; }
     </style>
 </head>
 <body>
@@ -123,19 +483,475 @@
             var totalSlides = 20; // 设定总页数 15~30 均可
             var currentSlide = 1;
             var isTransitioning = false; // 防抖锁
+            var coverReady = false;      // 封面原画是否已经可以显示（决定标题何时升起）
 
             var container = document.getElementById('slide-container');
             var pageIndicator = document.getElementById('pageIndicator');
             var lastAction = document.getElementById('lastAction');
+
+            /* ============================================================
+               最后一页的画面
+               ------------------------------------------------------------
+               课文节选停在老人“脸朝下趴在报纸上”的那一句。这一页不再出现
+               任何文字，只把这场搏斗的终点摆在黑暗中：一副被鲨鱼啃净的、
+               巨大的白色鱼骨架，和一点几乎看不见的晨光。
+               整幅骨架由代码生成（非图片素材），投影到任何尺寸都锐利。
+               ============================================================ */
+            var BONE = '#fbfaf7',
+                NV   = 32,      /* 脊椎节数 */
+                X0   = 610,     /* 脊椎起点 x */
+                X1   = 1335;    /* 脊椎终点 x */
+
+            function fx(n)     { return Math.round(n * 10) / 10; }
+            function spX(t)    { return X0 + (X1 - X0) * t; }
+            function spY(t)    { return 344 - 14 * Math.sin(Math.PI * t); }
+            function sclv(t)   { return 1 - 0.58 * t; }
+            function dorsY(t)  { return spY(t) - 8 * sclv(t); }
+            function ventY(t)  { return spY(t) + 8 * sclv(t); }
+
+            function buildSkeleton() {
+                var o = [], i, t, u;
+
+                /* --- 吻：两根收敛的骨线，马林鱼最好认的轮廓 --- */
+                o.push('<path d="M 60 366 L 470 340" />');
+                o.push('<path d="M 60 370 L 470 372" />');
+                for (i = 1; i <= 7; i++) {
+                    var bx = 60 + (410 / 8) * i,
+                        by1 = 366 + (340 - 366) * (i / 8) - 0.4,
+                        by2 = 370 + (372 - 370) * (i / 8) + 0.4;
+                    o.push('<path d="M ' + fx(bx) + ' ' + fx(by1) + ' L ' + fx(bx) + ' ' + fx(by2) + '" opacity="0.45" />');
+                }
+
+                /* --- 头骨与眼眶 --- */
+                o.push('<path d="M 470 340 L 520 322 C 570 306 606 318 624 348 L 630 372 ' +
+                       'C 612 398 574 408 536 402 L 486 396 C 468 386 464 358 470 340 Z" />');
+                o.push('<circle cx="546" cy="352" r="25" fill="none" />');
+                o.push('<circle cx="546" cy="352" r="5" fill="#fbfaf7" stroke="none" opacity="0.85" />');
+
+                /* --- 下颌：口微张，向前收成一点 --- */
+                o.push('<path d="M 616 396 C 540 412 420 424 344 428" />');
+                o.push('<path d="M 624 414 C 548 430 428 438 348 430" />');
+
+                /* --- 鳃弓与鳃盖 --- */
+                for (i = 0; i < 4; i++) {
+                    o.push('<path d="M ' + fx(600 - i * 3) + ' ' + fx(334 + i * 9) +
+                           ' Q ' + fx(706 + i * 7) + ' 388 ' + fx(614 - i * 2) + ' ' + fx(452 + i * 7) + '" />');
+                }
+                o.push('<path d="M 628 330 C 712 352 724 424 640 454" />');
+
+                /* --- 脊椎：连续锥体带 + 椎节分隔 --- */
+                var top = [], bot = [], SAMP = 64;
+                for (i = 0; i <= SAMP; i++) {
+                    t = i / SAMP;
+                    top.push(fx(spX(t)) + ' ' + fx(dorsY(t)));
+                    bot.push(fx(spX(t)) + ' ' + fx(ventY(t)));
+                }
+                o.push('<path d="M ' + top.join(' L ') + ' L ' + bot.reverse().join(' L ') + ' Z" />');
+                for (i = 0; i < NV; i++) {
+                    t = i / (NV - 1);
+                    o.push('<path d="M ' + fx(spX(t)) + ' ' + fx(dorsY(t)) +
+                           ' L ' + fx(spX(t)) + ' ' + fx(ventY(t)) + '" opacity="0.30" />');
+                }
+
+                /* --- 神经棘（背）与脉棘（腹）：脊椎两侧的“梳齿” --- */
+                for (i = 0; i < NV; i++) {
+                    t = i / (NV - 1);
+                    var s = sclv(t),
+                        ln = 40 * s * (0.62 + 0.55 * Math.sin(Math.PI * t));
+                    o.push('<path d="M ' + fx(spX(t)) + ' ' + fx(dorsY(t)) +
+                           ' L ' + fx(spX(t) + ln * 0.24) + ' ' + fx(dorsY(t) - ln) + '" opacity="0.92" />');
+                    if (t > 0.46) {
+                        var lv = 38 * s * (0.7 + 0.45 * Math.sin(Math.PI * t));
+                        o.push('<path d="M ' + fx(spX(t)) + ' ' + fx(ventY(t)) +
+                               ' L ' + fx(spX(t) + lv * 0.24) + ' ' + fx(ventY(t) + lv) + '" opacity="0.92" />');
+                    }
+                }
+
+                /* --- 肋骨：前半身最主要的体块，也是“被啃净”最直接的那一笔 --- */
+                var RB0 = 2, RB1 = 17;
+                for (i = RB0; i <= RB1; i++) {
+                    t = i / (NV - 1);
+                    var ur = (i - RB0) / (RB1 - RB0),
+                        rl = 152 * (0.38 + 0.62 * Math.sin(Math.PI * Math.pow(ur, 0.8))),
+                        dx = 26 + 10 * Math.sin(Math.PI * ur),
+                        y0 = ventY(t);
+                    o.push('<path d="M ' + fx(spX(t)) + ' ' + fx(y0) +
+                           ' Q ' + fx(spX(t) + dx * 0.25) + ' ' + fx(y0 + rl * 0.62) +
+                           ' ' + fx(spX(t) + dx) + ' ' + fx(y0 + rl) + '" />');
+                }
+
+                /* --- 背鳍：马林鱼的“帆”，前缘最高，顶缘圆滑下垂 --- */
+                var DS0 = 0.045, DS1 = 0.44, DN = 20;
+                for (i = 0; i <= DN; i++) {
+                    t = DS0 + (DS1 - DS0) * (i / DN);
+                    u = i / DN;
+                    var dl = 190 * Math.pow(1 - Math.pow(u, 1.7), 0.85) + 5,
+                        ox = spX(t), oy = dorsY(t);
+                    o.push('<path d="M ' + fx(ox) + ' ' + fx(oy) +
+                           ' Q ' + fx(ox + dl * 0.14) + ' ' + fx(oy - dl * 0.56) +
+                           ' ' + fx(ox + dl * 0.30) + ' ' + fx(oy - dl) +
+                           '" stroke-width="' + (i === 0 ? 3.2 : 2.6) +
+                           '" opacity="' + fx(i === 0 ? 1 : 0.9) + '" />');
+                }
+
+                /* --- 第二背鳍 / 臀鳍 --- */
+                for (i = 0; i <= 4; i++) {
+                    t = 0.78 + 0.10 * (i / 4);
+                    o.push('<path d="M ' + fx(spX(t)) + ' ' + fx(dorsY(t)) +
+                           ' L ' + fx(spX(t) + 13) + ' ' + fx(dorsY(t) - 40) + '" opacity="0.85" />');
+                    o.push('<path d="M ' + fx(spX(t)) + ' ' + fx(ventY(t)) +
+                           ' L ' + fx(spX(t) + 12) + ' ' + fx(ventY(t) + 34) + '" opacity="0.85" />');
+                }
+
+                /* --- 尾鳍：新月形，直接长在尾柄上 --- */
+                var ty = spY(1), e = X1,
+                    upT = [1595, 205], loT = [1595, 485], notch = [1450, ty];
+                o.push('<path d="M ' + fx(e) + ' ' + fx(ty - 10) +
+                       ' C 1420 290 1512 232 ' + upT[0] + ' ' + upT[1] +
+                       ' C 1524 252 1470 302 ' + notch[0] + ' ' + notch[1] +
+                       ' C 1470 386 1524 436 ' + loT[0] + ' ' + loT[1] +
+                       ' C 1512 458 1420 400 ' + fx(e) + ' ' + fx(ty + 10) + ' Z" />');
+                for (i = 1; i <= 6; i++) {
+                    u = i / 7;
+                    o.push('<path d="M ' + fx(e + 4) + ' ' + fx(ty) + ' L ' +
+                           fx(upT[0] + (notch[0] - upT[0]) * u) + ' ' + fx(upT[1] + (notch[1] - upT[1]) * u) +
+                           '" opacity="0.42" />');
+                    o.push('<path d="M ' + fx(e + 4) + ' ' + fx(ty) + ' L ' +
+                           fx(loT[0] + (notch[0] - loT[0]) * u) + ' ' + fx(loT[1] + (notch[1] - loT[1]) * u) +
+                           '" opacity="0.42" />');
+                }
+
+                return '<svg viewBox="0 0 1640 700" xmlns="http://www.w3.org/2000/svg" fill="none" ' +
+                       'stroke="' + BONE + '" stroke-width="2.6" stroke-linecap="round" ' +
+                       'stroke-linejoin="round">' + o.join('') + '</svg>';
+            }
+
+            function buildDawn() {
+                return '<svg viewBox="0 0 1920 1080" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
+                    '<defs>' +
+                      '<radialGradient id="dgCore" cx="50%" cy="50%" r="50%">' +
+                        '<stop offset="0%" stop-color="#fff8ea" stop-opacity="0.19"/>' +
+                        '<stop offset="38%" stop-color="#e9dcc6" stop-opacity="0.10"/>' +
+                        '<stop offset="72%" stop-color="#8fa3b0" stop-opacity="0.035"/>' +
+                        '<stop offset="100%" stop-color="#000000" stop-opacity="0"/>' +
+                      '</radialGradient>' +
+                      '<linearGradient id="dgSky" x1="0" y1="0" x2="0" y2="1">' +
+                        '<stop offset="0%" stop-color="#000000" stop-opacity="0"/>' +
+                        '<stop offset="55%" stop-color="#000000" stop-opacity="0"/>' +
+                        '<stop offset="100%" stop-color="#93a9b8" stop-opacity="0.09"/>' +
+                      '</linearGradient>' +
+                    '</defs>' +
+                    '<rect width="1920" height="1080" fill="#000000"/>' +
+                    '<rect width="1920" height="1080" fill="url(#dgSky)"/>' +
+                    '<ellipse cx="1030" cy="500" rx="780" ry="400" fill="url(#dgCore)"/>' +
+                    '</svg>';
+            }
+
+            function buildFinalScene() {
+                return '<div class="final-scene">' +
+                           '<div class="dawn">' + buildDawn() + '</div>' +
+                           '<div class="drift">' + buildSkeleton() + '</div>' +
+                       '</div>';
+            }
+
+            /* ============================================================
+               封面标题：照 docs/TOMATS.pptx 第 1 页的排版
+               ------------------------------------------------------------
+               三行：The Old Man and the Sea / 老人与海 / Ernest Miller Hemingway
+                    [美] 欧内斯特·米勒·海明威
+               出现方式仿 deepseecommerce.com 的写法：把句子拆成「词」，
+               每个词外面套一层 .wd（overflow:hidden）当作遮罩，里面的词块
+               从下方 110% 升到位，逐词递加 animation-delay —— 文字是“升”上来的，
+               不是直接亮出来的。中文按字拆（4 个字，错开大一点才看得出节奏）。
+               ============================================================ */
+            function rise(inner, delay) {
+                var d = delay.toFixed(3) + 's';
+                return '<span class="wd"><i style="-webkit-animation-delay:' + d +
+                       ';animation-delay:' + d + '">' + inner + '</i></span>';
+            }
+            function riseWords(text, t0, step) {
+                var parts = text.split(' '), out = [], i;
+                for (i = 0; i < parts.length; i++) {
+                    if (parts[i]) { out.push(rise(parts[i], t0 + i * step)); }
+                }
+                return out.join(' ');
+            }
+            function riseChars(text, t0, step) {
+                var out = [], i;
+                for (i = 0; i < text.length; i++) { out.push(rise(text.charAt(i), t0 + i * step)); }
+                return out.join('');
+            }
+
+            function buildCoverTitle() {
+                return '<div class="cover-title">' +
+                           '<div class="ct-en">' + riseWords('The Old Man and the Sea', 0.25, 0.07) + '</div>' +
+                           '<div class="ct-zh">' + riseChars('老人与海', 0.42, 0.09) + '</div>' +
+                           '<div class="ct-au">' + riseWords('Ernest Miller Hemingway', 0.72, 0.04) + '</div>' +
+                           '<div class="ct-au2">' +
+                               rise('<span class="brk">[</span>美<span class="brk">]</span>', 0.92) + ' ' +
+                               riseChars('欧内斯特·米勒·海明威', 1.00, 0.035) +
+                           '</div>' +
+                       '</div>';
+            }
+
+            /* ============================================================
+               第一页：风暴中的老人（画面素材在 assets/）
+               ------------------------------------------------------------
+               · Background.png  2304x1728 的完整画面（老人眼睛是睁着的）
+               · OldManEyes-Closed.png  闭眼贴片，按实测眼位叠在双眼上
+               · water-foam.png  由 three.js 的 waternormals.jpg 转出的白色浪花，
+                 平铺 + 滚动 background-position，制造海面流动的错觉
+               · man-mask.png    老人轮廓蒙版（白色=可出水，透明=老人），
+                 海面的一切动静都被它挡在老人身后
+               层序（由下往上）：原画 → 海面 → 柔边模糊块 → 浪纹 → 闭眼贴片，
+               外面套 .rock（横摇）/.heave（垂荡），做驾驶室式的颠簸 —— 里面全部是画；
+               .cover-title 放在 .rock 外面，文字不参与摇晃，只有升起动画。
+               ============================================================ */
+            function buildCoverScene() {
+                return '<div class="cover">' +
+                           '<div class="rock">' +
+                               '<div class="heave">' +
+                                   '<div class="stage">' +
+                                       '<img class="cover-art" src="assets/Background.png" alt="">' +
+                                       '<canvas class="cover-gl"></canvas>' +
+                                       '<div class="cover-blur"><img src="assets/Background.png" alt=""></div>' +
+                                       '<div class="cover-waves">' +
+                                           '<div class="cover-water w-far"><i></i></div>' +
+                                           '<div class="cover-water w-mid"><i></i></div>' +
+                                           '<div class="cover-water w-near"><i></i></div>' +
+                                       '</div>' +
+                                       '<img class="cover-eyes" src="assets/OldManEyes-Closed.png" alt="">' +
+                                   '</div>' +
+                               '</div>' +
+                           '</div>' +
+                           buildCoverTitle() +
+                       '</div>';
+            }
+
+            /* ============================================================
+               首页海面：WebGL 像素位移（真三维感）
+               ------------------------------------------------------------
+               把 waternormals.jpg 当法线，直接“推开” Background.png 自己的像素，
+               所以画里那些浪是真的在动、还带高光反光 —— 不是在上面盖一层纹理。
+               流向：画中浪自右侧卷来、脊线近水平，整体朝左下推进。
+               man-mask.png 当作遮挡蒙版：老人身上位移与高光都归零，
+               水因此在人的后面流动，轮廓也不会被拉扯变形。
+               若 WebGL 不可用，自动退回上面那三层 CSS 浪纹（同样被蒙版挡在老人身后）。
+               ============================================================ */
+            function initCoverWater() {
+                var cv = document.querySelector('.cover-gl');
+                if (!cv) { return; }
+                var cssLayers = document.querySelectorAll('.cover-water');
+
+                function giveUp() {
+                    if (cv.parentNode) { cv.parentNode.removeChild(cv); }
+                }
+
+                /* file:// 下浏览器禁止把本地图片上传给 WebGL
+                   (texImage2D 抛 SecurityError)，直接用 CSS 版本 */
+                if (location.protocol === 'file:') { giveUp(); return; }
+
+                var gl = null;
+                try {
+                    gl = cv.getContext('webgl') || cv.getContext('experimental-webgl');
+                } catch (e) { gl = null; }
+                if (!gl) { giveUp(); return; }
+
+                var VS = 'attribute vec2 p;varying vec2 vUv;' +
+                         'void main(){ vUv = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }';
+
+                var FS = [
+                    'precision mediump float;',
+                    'uniform sampler2D uArt;',
+                    'uniform sampler2D uNorm;',
+                    'uniform sampler2D uOcc;',
+                    'uniform vec2  uOff;',
+                    'uniform vec2  uRep;',
+                    'uniform float uDisp;',
+                    'uniform float uSpec;',
+                    'varying vec2 vUv;',
+                    'float ellip(vec2 p, vec2 c, vec2 r, float soft){',
+                    '    float d = length((p - c) / r);',
+                    '    return 1.0 - smoothstep(1.0 - soft, 1.0, d);',
+                    '}',
+                    'void main(){',
+                    '    vec2 ip = vec2(vUv.x, 1.0 - vUv.y);',
+                    '    float sea = smoothstep(0.400, 0.520, ip.y);',
+                    '    float ex = 0.0;',
+                    /* 只留船这一个椭圆：人交给 man-mask.png 精确遮挡，
+                       手调的椭圆留着反而会在人身旁糊出一块不动的死水 */
+                    '    ex = max(ex, ellip(ip, vec2(0.780, 0.880), vec2(0.270, 0.170), 0.40));',
+                    /* man-mask.png：老人身上 alpha=0 → 位移与高光都归零，
+                       水就只在人的后面走，轮廓边缘也不会被拉扯 */
+                    '    float occ = texture2D(uOcc, ip).a;',
+                    '    float mask = sea * (1.0 - ex) * occ;',
+                    '    float v = clamp((ip.y - 0.400) / 0.600, 0.0, 1.0);',
+                    '    float vv = pow(v, 1.60);',
+                    '    vec2 nuv = vec2(ip.x * uRep.x, vv * uRep.y) + uOff;',
+                    '    vec3 n = texture2D(uNorm, nuv).xyz * 2.0 - 1.0;',
+                    '    float ds = uDisp * (0.35 + 0.65 * v);',
+                    '    vec3 col = texture2D(uArt, clamp(ip + n.xy * ds * mask, vec2(0.002), vec2(0.998))).rgb;',
+                    '    vec3 nn = normalize(vec3(n.xy, 1.0));',
+                    '    vec3 L  = normalize(vec3(-0.45, 0.55, 0.70));',
+                    '    float sp = pow(max(dot(nn, L), 0.0), 28.0);',
+                    '    col += vec3(0.85, 0.92, 1.00) * sp * uSpec * mask;',
+                    '    gl_FragColor = vec4(col, 1.0);',
+                    '}'
+                ].join('\n');
+
+                function comp(type, src) {
+                    var s = gl.createShader(type);
+                    gl.shaderSource(s, src);
+                    gl.compileShader(s);
+                    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { return null; }
+                    return s;
+                }
+                var vsObj = comp(gl.VERTEX_SHADER, VS),
+                    fsObj = comp(gl.FRAGMENT_SHADER, FS);
+                if (!vsObj || !fsObj) { giveUp(); return; }
+
+                var prog = gl.createProgram();
+                gl.attachShader(prog, vsObj);
+                gl.attachShader(prog, fsObj);
+                gl.linkProgram(prog);
+                if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { giveUp(); return; }
+                gl.useProgram(prog);
+
+                var buf = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+                var pLoc = gl.getAttribLocation(prog, 'p');
+                gl.enableVertexAttribArray(pLoc);
+                gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
+
+                var U = {
+                    art:  gl.getUniformLocation(prog, 'uArt'),
+                    norm: gl.getUniformLocation(prog, 'uNorm'),
+                    occ:  gl.getUniformLocation(prog, 'uOcc'),
+                    off:  gl.getUniformLocation(prog, 'uOff'),
+                    rep:  gl.getUniformLocation(prog, 'uRep'),
+                    disp: gl.getUniformLocation(prog, 'uDisp'),
+                    spec: gl.getUniformLocation(prog, 'uSpec')
+                };
+
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
+                function makeTex(img, repeat) {
+                    var t = gl.createTexture();
+                    gl.bindTexture(gl.TEXTURE_2D, t);
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, repeat ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, repeat ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    return t;
+                }
+
+                /* 沿 DOM 往上找 .slide.active：中间多套几层 div（比如 .rock/.heave）也不怕 */
+                function onScreen() {
+                    var e = cv;
+                    while (e) {
+                        if (e.className && (' ' + e.className + ' ').indexOf(' active ') >= 0) { return true; }
+                        e = e.parentNode;
+                    }
+                    return false;
+                }
+
+                /* 流向与流速：+x 让贴图向左，-y 让贴图向下（朝观者） */
+                var DIR_X = 0.055, DIR_Y = -0.090;
+                var artTex = null, normTex = null, occTex = null, pending = 3, broken = false;
+
+                function resize() {
+                    var w = cv.clientWidth || 1, h = cv.clientHeight || 1;
+                    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+                    gl.viewport(0, 0, cv.width, cv.height);
+                }
+
+                var prev = 0, clock = 0;
+                function frame(ts) {
+                    requestAnimationFrame(frame);
+                    var dt = prev ? (ts - prev) : 0;
+                    prev = ts;
+                    /* 只在首页显示时才画，省电省 GPU */
+                    if (!onScreen()) { return; }
+                    clock += dt / 1000;
+
+                    resize();
+                    gl.uniform1i(U.art, 0);
+                    gl.uniform1i(U.norm, 1);
+                    gl.uniform1i(U.occ, 2);
+                    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, artTex);
+                    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, normTex);
+                    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, occTex);
+                    gl.uniform2f(U.off, clock * DIR_X, clock * DIR_Y);
+                    gl.uniform2f(U.rep, 2.2, 5.4);
+                    gl.uniform1f(U.disp, 0.0045);
+                    gl.uniform1f(U.spec, 0.55);
+                    gl.clearColor(0, 0, 0, 1);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                }
+
+                function ready() {
+                    if (--pending) { return; }
+                    if (broken || !artTex || !normTex || !occTex) { giveUp(); return; }
+                    /* WebGL 生效后关掉 CSS 浪纹，避免两套叠加 */
+                    for (var i = 0; i < cssLayers.length; i++) { cssLayers[i].style.display = 'none'; }
+                    requestAnimationFrame(frame);
+                }
+
+                var imgA = new Image(), imgN = new Image(), imgO = new Image();
+                imgA.onload = function () {
+                    try { artTex = makeTex(imgA, false); } catch (e) { broken = true; }
+                    ready();
+                };
+                imgA.onerror = function () { broken = true; ready(); };
+                imgN.onload = function () {
+                    try { normTex = makeTex(imgN, true); } catch (e) { broken = true; }
+                    ready();
+                };
+                imgN.onerror = function () { broken = true; ready(); };
+                imgO.onload = function () {
+                    try { occTex = makeTex(imgO, false); } catch (e) { broken = true; }
+                    ready();
+                };
+                imgO.onerror = function () { broken = true; ready(); };
+                imgA.src = 'assets/Background.png';
+                imgN.src = 'assets/waternormals.jpg';
+                imgO.src = 'assets/man-mask.png';
+            }
 
             // 1. 动态生成 20 页内容
             var slides = [];
             for (var i = 1; i <= totalSlides; i++) {
                 var slide = document.createElement('div');
                 slide.className = 'slide' + (i === 1 ? ' active' : '');
-                slide.innerHTML = '<h1>第 ' + i + ' 页</h1><p>点击屏幕上方 30% 返回上一页 | 点击下方 70% 进入下一页</p>';
+                if (i === 1) {
+                    /* 首页：风暴中的老人，一直眨眼，海面在流动 */
+                    slide.innerHTML = buildCoverScene();
+                } else if (i === totalSlides) {
+                    /* 最后一页：只有晨光与骨架，没有一个字 */
+                    slide.innerHTML = buildFinalScene();
+                } else {
+                    slide.innerHTML = '<h1>第 ' + i + ' 页</h1><p>点击屏幕上方 30% 返回上一页 | 点击下方 70% 进入下一页</p>';
+                }
                 container.appendChild(slide);
                 slides.push(slide);
+            }
+            updateSlide(); // 初始化一次，让封面也能收起状态栏
+            initCoverWater(); // 首页海面：WebGL 像素位移，失败自动退回 CSS 浪纹
+
+            /* 标题的升起动画要等原画解码完再开始，
+               否则老机器上会先看到白字在纯黑背景上飘起来，然后画面才“啪”地出现。 */
+            var coverArt = container.querySelector('.cover-art');
+            if (coverArt) {
+                if (coverArt.complete && coverArt.naturalWidth) {
+                    coverReady = true;
+                    applyBodyClass();
+                } else {
+                    coverArt.onload = function () { coverReady = true; applyBodyClass(); };
+                    coverArt.onerror = function () { coverReady = true; applyBodyClass(); }; // 加载失败也别把标题一直藏着
+                }
             }
 
             // 2. 更新页面显示
@@ -147,7 +963,16 @@
                         slides[i].className = 'slide';
                     }
                 }
+                applyBodyClass();
                 pageIndicator.innerText = currentSlide + ' / ' + totalSlides;
+            }
+
+            /* 首页与尾页是纯画面：body.is-clean 收掉状态栏和触控提示；
+               body.cover-ready 表示原画已经画得出来，标题可以开始升起了 */
+            function applyBodyClass() {
+                document.body.className =
+                    ((currentSlide === 1 || currentSlide === totalSlides) ? 'is-clean' : '') +
+                    (coverReady ? ' cover-ready' : '');
             }
 
             // 3. 记录操作日志
