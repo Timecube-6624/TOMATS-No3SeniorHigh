@@ -154,6 +154,344 @@
             to   { transform: translateY(-8px) rotate(0.5deg); }
         }
 
+        /* ====== 加载页 ======
+           样式照 deepseecommerce.com 的 preloader：整屏压黑、中间字标、
+           底部细进度条 + 大号百分比，加载完淡出。
+           它顺便解决自动播放：浏览器要求“用户有过交互”才允许出声，
+           如果到 100% 还是被拦，这里就显示「点击开始」—— 那一下点击就是它要的交互。 */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            background: #000;
+            color: #fff;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            -webkit-justify-content: center;
+            justify-content: center;
+            -webkit-align-items: center;
+            align-items: center;
+            box-sizing: border-box;
+            opacity: 1;
+            -webkit-transition: opacity 0.8s ease;
+            transition: opacity 0.8s ease;
+        }
+        #loader.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loader-mark { text-align: center; }
+        .loader-mark .lm-zh {
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-weight: 800;
+            font-size: 5vw;
+            line-height: 1.2;
+            letter-spacing: 0.02em;
+            opacity: 0;
+            -webkit-animation: loaderIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+            animation: loaderIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+        }
+        .loader-mark .lm-en {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 1vw;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.55);
+            margin-top: 1.1vw;
+            padding-left: 0.4em;      /* 补掉 letter-spacing 造成的右偏 */
+            opacity: 0;
+            -webkit-animation: loaderIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+            animation: loaderIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+        @-webkit-keyframes loaderIn {
+            from { opacity: 0; -webkit-transform: translateY(16px); }
+            to   { opacity: 1; -webkit-transform: translateY(0); }
+        }
+        @keyframes loaderIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 底部的百分比 + 细进度条（和参考站一样：走满整屏宽） */
+        .loader-bottom {
+            position: absolute;
+            left: 0;
+            bottom: 5vh;
+            width: 100%;
+            padding: 0 8vw;
+            box-sizing: border-box;
+        }
+        .loader-pct {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 2vw;
+            letter-spacing: 0.04em;
+            color: #f2f2f2;
+            margin-bottom: 1.4vh;
+        }
+        .loader-bar {
+            position: relative;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.16);
+            overflow: hidden;
+        }
+        .loader-bar i {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: #ffffff;
+            -webkit-transition: width 0.28s ease-out;
+            transition: width 0.28s ease-out;
+        }
+        /* 到 100% 仍被浏览器拦自动播放时，换成「点击开始」 */
+        .loader-tap {
+            display: none;
+            font-size: 1.5vw;
+            letter-spacing: 0.24em;
+            color: #ffffff;
+            margin-bottom: 1.4vh;
+            -webkit-animation: loaderTap 1.8s ease-in-out infinite;
+            animation: loaderTap 1.8s ease-in-out infinite;
+        }
+        #loader.need-tap .loader-pct { display: none; }
+        #loader.need-tap .loader-tap { display: block; }
+        @-webkit-keyframes loaderTap { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+        @keyframes loaderTap { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+        /* ====== 第二页：目录（水底环境）======
+           排版语言照 deepseecommerce.com：小字距大写标签、超大标题、负字距、
+           细分割线从左侧 scaleX 长出来、少量青色点缀；
+           环境用五层叠出来 —— 深水渐变 / 模糊海水底 / 焦散光斑 / 光柱 / 悬浮颗粒。 */
+        .sea-scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #04121a;
+        }
+        /* 深水：上浅下深，顶部一点水面透光 */
+        .sea-deep {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                -webkit-radial-gradient(120% 85% at 50% -18%, rgba(126, 214, 232, 0.30) 0%, rgba(32, 116, 138, 0.16) 34%, rgba(4, 24, 32, 0) 64%),
+                -webkit-linear-gradient(to bottom, #0d2f3a 0%, #08202a 36%, #04141c 68%, #010a0e 100%);
+            background:
+                radial-gradient(120% 85% at 50% -18%, rgba(126, 214, 232, 0.30) 0%, rgba(32, 116, 138, 0.16) 34%, rgba(4, 24, 32, 0) 64%),
+                linear-gradient(to bottom, #0d2f3a 0%, #08202a 36%, #04141c 68%, #010a0e 100%);
+        }
+        /* 模糊的海水底（背景图由 JS 填，和封面用同一张） */
+        .sea-photo {
+            position: absolute;
+            top: -8%;
+            left: -8%;
+            width: 116%;
+            height: 116%;
+            background-size: cover;
+            background-position: 50% 70%;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            -webkit-filter: blur(16px) saturate(0.6) brightness(0.45) hue-rotate(-14deg);
+            filter: blur(16px) saturate(0.6) brightness(0.45) hue-rotate(-14deg);
+        }
+        /* 水底焦散光斑：拿浪花图当光斑纹理，慢慢漂 */
+        .sea-caustics {
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            background-image: url("assets/water-foam.png");
+            background-repeat: repeat;
+            background-size: 46% auto;
+            opacity: 0.09;
+            -webkit-filter: blur(2px);
+            filter: blur(2px);
+            -webkit-animation: seaCaustics 42s linear infinite;
+            animation: seaCaustics 42s linear infinite;
+        }
+        @-webkit-keyframes seaCaustics {
+            from { -webkit-transform: translate3d(0, 0, 0); }
+            to   { -webkit-transform: translate3d(-46%, 14%, 0); }
+        }
+        @keyframes seaCaustics {
+            from { transform: translate3d(0, 0, 0); }
+            to   { transform: translate3d(-46%, 14%, 0); }
+        }
+        /* 光柱：从水面斜插下来，缓慢摆 */
+        .sea-rays i {
+            position: absolute;
+            top: -45%;
+            height: 165%;
+            background: -webkit-linear-gradient(to bottom, rgba(188, 238, 252, 0.26) 0%, rgba(188, 238, 252, 0.05) 46%, rgba(188, 238, 252, 0) 74%);
+            background: linear-gradient(to bottom, rgba(188, 238, 252, 0.26) 0%, rgba(188, 238, 252, 0.05) 46%, rgba(188, 238, 252, 0) 74%);
+            -webkit-filter: blur(7px);
+            filter: blur(7px);
+            -webkit-transform-origin: top center;
+            transform-origin: top center;
+            -webkit-animation: raySway 13s ease-in-out infinite alternate;
+            animation: raySway 13s ease-in-out infinite alternate;
+        }
+        @-webkit-keyframes raySway {
+            from { -webkit-transform: skewX(-11deg) rotate(-1.6deg); }
+            to   { -webkit-transform: skewX(-11deg) rotate(1.6deg); }
+        }
+        @keyframes raySway {
+            from { transform: skewX(-11deg) rotate(-1.6deg); }
+            to   { transform: skewX(-11deg) rotate(1.6deg); }
+        }
+        /* 悬浮颗粒：慢慢往上飘 */
+        .sea-motes i {
+            position: absolute;
+            bottom: -4vh;
+            border-radius: 50%;
+            background: rgba(214, 246, 255, 0.6);
+            -webkit-animation-name: moteRise;
+            animation-name: moteRise;
+            -webkit-animation-timing-function: linear;
+            animation-timing-function: linear;
+            -webkit-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+        }
+        @-webkit-keyframes moteRise {
+            0%   { -webkit-transform: translate3d(0, 0, 0); opacity: 0; }
+            12%  { opacity: 0.85; }
+            88%  { opacity: 0.5; }
+            100% { -webkit-transform: translate3d(4vw, -96vh, 0); opacity: 0; }
+        }
+        @keyframes moteRise {
+            0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+            12%  { opacity: 0.85; }
+            88%  { opacity: 0.5; }
+            100% { transform: translate3d(4vw, -96vh, 0); opacity: 0; }
+        }
+        .sea-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: -webkit-radial-gradient(115% 95% at 50% 42%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0.58) 100%);
+            background: radial-gradient(115% 95% at 50% 42%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0.58) 100%);
+        }
+
+        /* ---- 目录条目 ---- */
+        .toc {
+            position: absolute;
+            left: 11vw;
+            right: 11vw;
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+        .toc-label {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 0.95vw;
+            letter-spacing: 0.34em;
+            text-transform: uppercase;
+            color: rgba(186, 232, 245, 0.62);
+            margin-bottom: 3.4vh;
+            padding-left: 0.34em;
+            opacity: 0;
+        }
+        .slide.active .toc-label {
+            -webkit-animation: tocFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+            animation: tocFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+        }
+        .toc-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .toc-row, .toc-end {
+            position: relative;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: baseline;
+            align-items: baseline;
+        }
+        .toc-row { padding: 2.5vh 0 2.7vh 0; }
+        .toc-end { height: 0; }
+        /* 分割线：从左侧长出来（参考站的做法） */
+        .toc-row::before, .toc-end::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(186, 232, 245, 0.22);
+            -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+            -webkit-transform-origin: left center;
+            transform-origin: left center;
+        }
+        .slide.active .toc-row::before,
+        .slide.active .toc-end::before {
+            -webkit-animation: tocLine 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+            animation: tocLine 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @-webkit-keyframes tocLine {
+            from { -webkit-transform: scaleX(0); }
+            to   { -webkit-transform: scaleX(1); }
+        }
+        @keyframes tocLine {
+            from { transform: scaleX(0); }
+            to   { transform: scaleX(1); }
+        }
+        @-webkit-keyframes tocFadeUp {
+            from { opacity: 0; -webkit-transform: translateY(12px); }
+            to   { opacity: 1; -webkit-transform: translateY(0); }
+        }
+        @keyframes tocFadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .toc-idx {
+            -webkit-flex: none;
+            flex: none;
+            width: 9vw;
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 2.9vw;
+            font-weight: 800;
+            line-height: 1;
+            color: rgba(122, 214, 232, 0.75);
+        }
+        .toc-name {
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 4.1vw;
+            font-weight: 800;
+            line-height: 1.06;
+            letter-spacing: 0.02em;
+            color: #f2f2f2;
+        }
+        .toc-en {
+            margin-left: auto;
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 0.95vw;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(186, 232, 245, 0.5);
+            padding-left: 2em;
+            opacity: 0;
+        }
+        .slide.active .toc-en {
+            -webkit-animation: tocFadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: tocFadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
         /* ====== 第一页：风暴中的老人 ======
            画面按 Background.png 的原始比例(2304x1728)做成舞台，
            这样“闭眼”贴片可以直接用画面像素坐标摆放，不会随窗口比例漂移。 */
@@ -261,6 +599,16 @@
             width: 191.524%;
             height: 192.858%;
         }
+        /* 柔焦块随文字一起浮出来（延迟由 JS 按 TEXT_START 注入）：
+           基础态本来就是不透明的，靠 animation 的 backwards 填充在文字出现前保持透明，
+           这样翻走时柔焦不会“突然变清”。
+           能改的只有时长 1.7s 和关键帧；起始时间在 TEXT_START + 0.25。 */
+        .cover-ready .slide.active .cover-blur {
+            -webkit-animation: blurVeil 1.7s ease-out both;
+            animation: blurVeil 1.7s ease-out both;
+        }
+        @-webkit-keyframes blurVeil { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes blurVeil { from { opacity: 0; } to { opacity: 1; } }
 
         /* ---- 海面：三层「远/中/近」----
            画里左侧浪脊近水平、向右上收敛，巨浪自右侧卷下，所以水整体流向左下。
@@ -347,6 +695,58 @@
         @-webkit-keyframes waterNear { from { -webkit-transform: translate3d(0,0,0); } to { -webkit-transform: translate3d(-650px, 250px, 0); } }
         @keyframes        waterNear { from { transform: translate3d(0,0,0); } to { transform: translate3d(-650px, 250px, 0); } }
 
+        /* ====== 老人独立一层（无人物背景 + OldMan-Body.png）======
+           OldMan-Body.png 是 Background.png 的 1:1 逐像素抠图，实测对齐在原画
+           (220, 199)、缩放 1.0000 —— 换成 Noobject-Ocean 那张无人背景后，
+           把他按同样的位置贴回去，尺寸/位置完全对得上，于是他可以单独动。
+           坐标都用舞台百分比：left 220/2304=9.5486%、top 199/1728=11.5162%、
+           width 1663/2304=72.1788%、height 1529/1728=88.4838%。
+           闭眼贴片挂在这一层里面，于是眨眼会跟着人一起晃。 */
+        .cover-man-wrap {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .cover-man { display: none; }
+        .cover-man-wrap img.cover-man {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+        /* 有了无人背景：这一层缩到人身上，并给他一点“慢半拍”的晃动 */
+        body.has-ocean .cover-man-wrap {
+            left: 9.5486%;
+            top: 11.5162%;
+            width: 72.1788%;
+            height: 88.4838%;
+            transform-origin: 56% 97%;      /* 以脚下为轴：上身晃，脚底贴着船舷不动 */
+        }
+        body.has-ocean .cover-man { display: block; }
+        body.has-ocean .slide.active .cover-man-wrap {
+            -webkit-animation: manSway 10s ease-in-out infinite alternate;
+            animation: manSway 10s ease-in-out infinite alternate;
+            -webkit-animation-delay: -0.7s;   /* 负延迟 = 相位落后船的横摇 0.7s */
+            animation-delay: -0.7s;
+        }
+        @-webkit-keyframes manSway {
+            from { -webkit-transform: rotate(-0.55deg) translateY(0.3%); }
+            to   { -webkit-transform: rotate(0.55deg) translateY(-0.3%); }
+        }
+        @keyframes manSway {
+            from { transform: rotate(-0.55deg) translateY(0.3%); }
+            to   { transform: rotate(0.55deg) translateY(-0.3%); }
+        }
+        /* 闭眼贴片：没有无人背景时按舞台比例摆（人已经画在背景里）；
+           有无人背景时按“人”那一层的比例摆（52.375% / 26.00% / 10.598%
+           就是把原来的 47.3557% / 34.5251% / 7.6492% 换算进人那一层） */
+        body.has-ocean .cover-eyes {
+            left: 52.375%;
+            top: 26.00%;
+            width: 10.598%;
+        }
+
         /* 闭眼贴片：按实测眼位对位（旋转 2.456°，与画面 1:1） */
         .cover-eyes {
             left: 47.3557%;
@@ -373,6 +773,36 @@
         @keyframes blink {
             0%,     83.33% { opacity: 0; }
             83.34%, 100%   { opacity: 1; }
+        }
+
+        /* ====== 入场：像镜头对焦一样推上来 ======
+           画面从「略微推近 + 虚焦 + 透明」收成「原尺寸 + 实焦 + 不透明」，
+           用 scale 从中心放大、blur 从大到 0、opacity 淡入，3.2s 到位；
+           文字在 2.6s 之后才逐词升起，全程约 5s。
+           .intro-run 由 JS 在「原画就绪 + 停在第 1 页」时加上，动画结束就摘掉 ——
+           否则 blur(0) 会一直挂着一个全屏滤镜层，老机器上白掉帧。 */
+        .cover-intro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .cover-intro.intro-run {
+            -webkit-animation: coverFocus 3.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: coverFocus 3.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @-webkit-keyframes coverFocus {
+            0%   { opacity: 0;   -webkit-transform: scale(1.15); -webkit-filter: blur(1.6vw); }
+            18%  { opacity: 0.9; }
+            55%  { -webkit-transform: scale(1.04); -webkit-filter: blur(0.6vw); }
+            100% { opacity: 1;   -webkit-transform: scale(1);    -webkit-filter: blur(0); }
+        }
+        @keyframes coverFocus {
+            0%   { opacity: 0;   transform: scale(1.15); filter: blur(1.6vw); }
+            18%  { opacity: 0.9; }
+            55%  { transform: scale(1.04); filter: blur(0.6vw); }
+            100% { opacity: 1;   transform: scale(1);    filter: blur(0); }
         }
 
         /* ====== 封面标题：照 docs/TOMATS.pptx 第 1 页的排版 ======
@@ -464,6 +894,19 @@
 </head>
 <body>
 
+    <!-- 加载页 -->
+    <div id="loader">
+        <div class="loader-mark">
+            <div class="lm-zh">老人与海</div>
+            <div class="lm-en">The Old Man and the Sea</div>
+        </div>
+        <div class="loader-bottom">
+            <div class="loader-pct" id="loaderPct">0%</div>
+            <div class="loader-tap">点击开始 · CLICK TO BEGIN</div>
+            <div class="loader-bar"><i id="loaderBar"></i></div>
+        </div>
+    </div>
+
     <!-- 幻灯片容器（由JS动态生成20页） -->
     <div id="slide-container"></div>
 
@@ -483,11 +926,125 @@
             var totalSlides = 20; // 设定总页数 15~30 均可
             var currentSlide = 1;
             var isTransitioning = false; // 防抖锁
-            var coverReady = false;      // 封面原画是否已经可以显示（决定标题何时升起）
+            var coverReady = false;      // 封面原画是否已经可以显示（决定入场/标题何时开始）
+
+            /* 封面节奏：镜头对焦 3.2s；文字从 2.7s 起逐个升起，最后一个词 5.00s 到位 ——
+               对焦 + 文字整段入场正好 5 秒。柔焦块跟着文字一起浮出（2.95s 起）。 */
+            var TEXT_START = 2.7;        // 文字动画的整体起始延迟（秒）
+
+            /* 首页环境音：两条一起循环混播，离开第一页就停 */
+            var COVER_AUDIO = [
+                { src: 'assets/audio/page1/1436_sea-waves-02.mp3', vol: 0.55 },  // 海浪（23.7s 一循环）
+                { src: 'assets/audio/page1/umblings-of-thunder.mp3', vol: 0.80 } // 远处的雷（215s）
+            ];
+            var FADE_IN_MS = 2000;       // 画面出现时，声音缓入 2s
+            var FADE_OUT_MS = 700;       // 离开第一页时，缓出 0.7s
+            var coverAudio = [];         // 播放器实例
+
+            /* 首页背景图：优先用「去掉老人、保留船」的那张，
+               这样老人可以从背景里拆出来单独晃；文件不在就自动退回原来的 Background.png
+               （人已经画在里面，此时不叠加人图层）。扩展名写几个候选，省得改名。 */
+            var COVER_ART_TRY = [
+                'assets/Noobject-Ocean.png',
+                'assets/Noobject-Ocean.jpg',
+                'assets/Noobject-Ocean.jpeg',
+                'assets/Noobject-Ocean.webp',
+                'assets/Noobject-Ocean.PNG'
+            ];
+            var COVER_ART_FALLBACK = 'assets/Background.png';
+            var hasOceanArt = false;
+            var oceanSrc = COVER_ART_FALLBACK;        // 加载页解析出来的背景图路径
+            var preImgs = { art: null, man: null, eyes: null, norm: null, occ: null };  // 预加载好的图
+            var audioBlocked = false;                 // 浏览器是否拦了带声音的自动播放
+
+            /* 加载页状态（必须在 initLoader() 之前赋初值，否则会被后面的 var 重置） */
+            var loaderEl = null, loaderBarEl = null, loaderPctEl = null;
+            var LOAD_TOTAL = 7, LOAD_DONE = 0;
+            var gestureSeen = false, coverRevealed = false, tapPromptShown = false, deckLocked = true;
 
             var container = document.getElementById('slide-container');
             var pageIndicator = document.getElementById('pageIndicator');
             var lastAction = document.getElementById('lastAction');
+
+            /* ============================================================
+               第二页：目录（水底）
+               ------------------------------------------------------------
+               环境：深水渐变 + 模糊海水底 + 焦散光斑 + 光柱 + 悬浮颗粒 + 暗角；
+               条目：一 / 二 / 三 + 中文标题 + 英文小注，细分割线从左侧长出来，
+                     文字用和封面同一套遮罩升起（.wd + wordRise），逐条错开 0.18s。
+               ============================================================ */
+            var TOC_ITEMS = [
+                { idx: '一', name: '写作背景', en: 'Writing Background' },
+                { idx: '二', name: '课文梗概', en: 'Plot Summary' },
+                { idx: '三', name: '人物形象', en: 'Characters' }
+            ];
+
+            /* 光柱：位置、宽窄、延迟都写死，重播时完全一致 */
+            function buildSeaRays() {
+                var rays = [
+                    { l: 8,  w: 5.5, o: 0.55, d: 0 },
+                    { l: 24, w: 3.4, o: 0.40, d: -3.2 },
+                    { l: 41, w: 6.2, o: 0.50, d: -1.4 },
+                    { l: 62, w: 3.8, o: 0.36, d: -5.1 },
+                    { l: 78, w: 5.0, o: 0.46, d: -2.3 }
+                ], out = '', i, r;
+                for (i = 0; i < rays.length; i++) {
+                    r = rays[i];
+                    out += '<i style="left:' + r.l + '%;width:' + r.w + 'vw;opacity:' + r.o +
+                           ';-webkit-animation-delay:' + r.d + 's;animation-delay:' + r.d + 's"></i>';
+                }
+                return out;
+            }
+
+            /* 悬浮颗粒：确定式分布（不用随机数），重播时一样 */
+            function buildSeaMotes(n) {
+                var out = '', i, l, size, dur, delay;
+                for (i = 0; i < n; i++) {
+                    l = (i * 37 + 7) % 100;
+                    size = 2 + (i % 3);
+                    dur = 15 + (i % 6) * 3;
+                    delay = -((i * 2.3) % 18);
+                    out += '<i style="left:' + l + '%;width:' + size + 'px;height:' + size + 'px;' +
+                           '-webkit-animation-duration:' + dur + 's;animation-duration:' + dur + 's;' +
+                           '-webkit-animation-delay:' + delay.toFixed(1) + 's;animation-delay:' + delay.toFixed(1) + 's"></i>';
+                }
+                return out;
+            }
+
+            function buildContentsScene() {
+                var rows = '', css = '', i, it, t0, lineDelay;
+                for (i = 0; i < TOC_ITEMS.length; i++) {
+                    it = TOC_ITEMS[i];
+                    t0 = 0.45 + i * 0.18;
+                    lineDelay = 0.30 + i * 0.18;
+                    css += '.toc-row:nth-child(' + (i + 1) + ')::before{-webkit-animation-delay:' +
+                           lineDelay.toFixed(2) + 's;animation-delay:' + lineDelay.toFixed(2) + 's}';
+                    rows += '<li class="toc-row">' +
+                                '<span class="toc-idx">' + riseChars(it.idx, t0, 0.05) + '</span>' +
+                                '<span class="toc-name">' + riseChars(it.name, t0 + 0.06, 0.05) + '</span>' +
+                                '<span class="toc-en" style="-webkit-animation-delay:' + (t0 + 0.3).toFixed(2) +
+                                    's;animation-delay:' + (t0 + 0.3).toFixed(2) + 's">' + it.en + '</span>' +
+                            '</li>';
+                }
+                /* 最后一条下面的收尾线，跟着最后一行一起长出来 */
+                css += '.toc-end::before{-webkit-animation-delay:' + (0.30 + TOC_ITEMS.length * 0.18).toFixed(2) +
+                       's;animation-delay:' + (0.30 + TOC_ITEMS.length * 0.18).toFixed(2) + 's}';
+
+                return '<div class="sea-scene">' +
+                           '<div class="sea-deep"></div>' +
+                           '<div class="sea-photo"></div>' +
+                           '<div class="sea-caustics"></div>' +
+                           '<div class="sea-rays">' + buildSeaRays() + '</div>' +
+                           '<div class="sea-motes">' + buildSeaMotes(16) + '</div>' +
+                           '<div class="sea-vignette"></div>' +
+                           '<div class="toc">' +
+                               '<div class="toc-label">Contents · 目录</div>' +
+                               '<ul class="toc-list">' + rows + '</ul>' +
+                               '<div class="toc-end"></div>' +
+                           '</div>' +
+                           '<style>' + css + '</style>' +
+                       '</div>';
+            }
 
             /* ============================================================
                最后一页的画面
@@ -683,13 +1240,14 @@
             }
 
             function buildCoverTitle() {
+                var T0 = TEXT_START, T = function (x) { return T0 + x; };   // 整体后移，等镜头对完焦
                 return '<div class="cover-title">' +
-                           '<div class="ct-en">' + riseWords('The Old Man and the Sea', 0.25, 0.07) + '</div>' +
-                           '<div class="ct-zh">' + riseChars('老人与海', 0.42, 0.09) + '</div>' +
-                           '<div class="ct-au">' + riseWords('Ernest Miller Hemingway', 0.72, 0.04) + '</div>' +
+                           '<div class="ct-en">' + riseWords('The Old Man and the Sea', T(0.25), 0.07) + '</div>' +
+                           '<div class="ct-zh">' + riseChars('老人与海', T(0.42), 0.09) + '</div>' +
+                           '<div class="ct-au">' + riseWords('Ernest Miller Hemingway', T(0.72), 0.04) + '</div>' +
                            '<div class="ct-au2">' +
-                               rise('<span class="brk">[</span>美<span class="brk">]</span>', 0.92) + ' ' +
-                               riseChars('欧内斯特·米勒·海明威', 1.00, 0.035) +
+                               rise('<span class="brk">[</span>美<span class="brk">]</span>', T(0.92)) + ' ' +
+                               riseChars('欧内斯特·米勒·海明威', T(1.00), 0.035) +
                            '</div>' +
                        '</div>';
             }
@@ -709,18 +1267,23 @@
                ============================================================ */
             function buildCoverScene() {
                 return '<div class="cover">' +
-                           '<div class="rock">' +
-                               '<div class="heave">' +
-                                   '<div class="stage">' +
-                                       '<img class="cover-art" src="assets/Background.png" alt="">' +
+                           '<div class="cover-intro">' +
+                               '<div class="rock">' +
+                                   '<div class="heave">' +
+                                       '<div class="stage">' +
+                                       '<img class="cover-art" alt="">' +
                                        '<canvas class="cover-gl"></canvas>' +
-                                       '<div class="cover-blur"><img src="assets/Background.png" alt=""></div>' +
+                                       '<div class="cover-blur"><img alt=""></div>' +
                                        '<div class="cover-waves">' +
                                            '<div class="cover-water w-far"><i></i></div>' +
                                            '<div class="cover-water w-mid"><i></i></div>' +
                                            '<div class="cover-water w-near"><i></i></div>' +
                                        '</div>' +
-                                       '<img class="cover-eyes" src="assets/OldManEyes-Closed.png" alt="">' +
+                                       '<div class="cover-man-wrap">' +
+                                           '<img class="cover-man" src="assets/OldMan-Body.png" alt="">' +
+                                           '<img class="cover-eyes" src="assets/OldManEyes-Closed.png" alt="">' +
+                                       '</div>' +
+                                       '</div>' +
                                    '</div>' +
                                '</div>' +
                            '</div>' +
@@ -738,7 +1301,7 @@
                水因此在人的后面流动，轮廓也不会被拉扯变形。
                若 WebGL 不可用，自动退回上面那三层 CSS 浪纹（同样被蒙版挡在老人身后）。
                ============================================================ */
-            function initCoverWater() {
+            function initCoverWater(imgs) {
                 var cv = document.querySelector('.cover-gl');
                 if (!cv) { return; }
                 var cssLayers = document.querySelectorAll('.cover-water');
@@ -900,25 +1463,34 @@
                     requestAnimationFrame(frame);
                 }
 
-                var imgA = new Image(), imgN = new Image(), imgO = new Image();
-                imgA.onload = function () {
-                    try { artTex = makeTex(imgA, false); } catch (e) { broken = true; }
-                    ready();
-                };
-                imgA.onerror = function () { broken = true; ready(); };
-                imgN.onload = function () {
-                    try { normTex = makeTex(imgN, true); } catch (e) { broken = true; }
-                    ready();
-                };
-                imgN.onerror = function () { broken = true; ready(); };
-                imgO.onload = function () {
-                    try { occTex = makeTex(imgO, false); } catch (e) { broken = true; }
-                    ready();
-                };
-                imgO.onerror = function () { broken = true; ready(); };
-                imgA.src = 'assets/Background.png';
-                imgN.src = 'assets/waternormals.jpg';
-                imgO.src = 'assets/man-mask.png';
+                /* 图在加载页里已经下载/解码过了，这里直接拿来上传纹理 */
+                var imgA = (imgs && imgs.art) || new Image(),
+                    imgN = (imgs && imgs.norm) || new Image(),
+                    imgO = (imgs && imgs.occ) || new Image();
+
+                function useTex(img, repeat, isArt, isOcc) {
+                    if (!img || !img.src) { broken = true; ready(); return; }   /* 没图就别硬上，退回 CSS 浪纹 */
+                    if (img.complete && img.naturalWidth) {
+                        try {
+                            var t = makeTex(img, repeat);
+                            if (isArt) { artTex = t; } else if (isOcc) { occTex = t; } else { normTex = t; }
+                        } catch (e) { broken = true; }
+                        ready();
+                        return;
+                    }
+                    img.onload = function () {
+                        try {
+                            var t2 = makeTex(img, repeat);
+                            if (isArt) { artTex = t2; } else if (isOcc) { occTex = t2; } else { normTex = t2; }
+                        } catch (e) { broken = true; }
+                        ready();
+                    };
+                    img.onerror = function () { broken = true; ready(); };
+                }
+
+                useTex(imgA, false, true, false);
+                useTex(imgN, true, false, false);
+                useTex(imgO, false, false, true);
             }
 
             // 1. 动态生成 20 页内容
@@ -929,6 +1501,9 @@
                 if (i === 1) {
                     /* 首页：风暴中的老人，一直眨眼，海面在流动 */
                     slide.innerHTML = buildCoverScene();
+                } else if (i === 2) {
+                    /* 目录页：水底环境 + 三个部分 */
+                    slide.innerHTML = buildContentsScene();
                 } else if (i === totalSlides) {
                     /* 最后一页：只有晨光与骨架，没有一个字 */
                     slide.innerHTML = buildFinalScene();
@@ -938,20 +1513,114 @@
                 container.appendChild(slide);
                 slides.push(slide);
             }
-            updateSlide(); // 初始化一次，让封面也能收起状态栏
-            initCoverWater(); // 首页海面：WebGL 像素位移，失败自动退回 CSS 浪纹
+            initCoverAudio(assetDone); // 首页环境音：海浪 + 雷声，循环混播（顺带算进加载进度）
+            initLoader();              // 加载页：预加载 + 进度条；完成后掀开封面
 
-            /* 标题的升起动画要等原画解码完再开始，
-               否则老机器上会先看到白字在纯黑背景上飘起来，然后画面才“啪”地出现。 */
-            var coverArt = container.querySelector('.cover-art');
-            if (coverArt) {
-                if (coverArt.complete && coverArt.naturalWidth) {
-                    coverReady = true;
-                    applyBodyClass();
-                } else {
-                    coverArt.onload = function () { coverReady = true; applyBodyClass(); };
-                    coverArt.onerror = function () { coverReady = true; applyBodyClass(); }; // 加载失败也别把标题一直藏着
+            /* ============================================================
+               加载页
+               ------------------------------------------------------------
+               1) 预加载 7 项：背景图(候选)、老人、闭眼贴片、法线图、遮挡蒙版、两条音频
+               2) 进度条 + 百分比实时跟着走
+               3) 100% 后：先试播声音 →
+                    能响：直接淡出加载页，封面开始对焦；
+                    被拦：加载页切成「点击开始」，那一下点击就是浏览器要的交互，
+                          点完立刻出声，同时掀开加载页。
+               ============================================================ */
+
+
+            function initLoader() {
+                loaderEl = document.getElementById('loader');
+                loaderBarEl = document.getElementById('loaderBar');
+                loaderPctEl = document.getElementById('loaderPct');
+                document.addEventListener('click', onLoadGesture, false);
+                document.addEventListener('keydown', onLoadGesture, false);
+                document.addEventListener('touchstart', onLoadGesture, false);
+                preloadAssets();
+            }
+
+            /* 加载期间用户点了一下/按了一下：记下来，必要时用它解锁声音 */
+            function onLoadGesture() {
+                gestureSeen = true;
+                if (tapPromptShown && !coverRevealed) {
+                    playCoverAudio();   // 在用户手势里播放，浏览器才允许出声
+                    revealCover();
                 }
+            }
+
+            function assetDone() {
+                LOAD_DONE++;
+                if (LOAD_DONE > LOAD_TOTAL) { LOAD_DONE = LOAD_TOTAL; }
+                var pct = Math.round(100 * LOAD_DONE / LOAD_TOTAL);
+                if (loaderBarEl) { loaderBarEl.style.width = pct + '%'; }
+                if (loaderPctEl) { loaderPctEl.innerText = pct + '%'; }
+                if (LOAD_DONE >= LOAD_TOTAL) { onAllLoaded(); }
+            }
+
+            function loadImageInto(url, key, done) {
+                var im = new Image();
+                im.onload = function () { preImgs[key] = im; done(); };
+                im.onerror = function () { done(); };
+                im.src = url;
+            }
+
+            function preloadAssets() {
+                /* 1) 背景图：依次试候选，全都没有就退回老背景 */
+                var i = 0;
+                (function tryNext() {
+                    if (i >= COVER_ART_TRY.length) { oceanSrc = COVER_ART_FALLBACK; hasOceanArt = false; loadImageInto(COVER_ART_FALLBACK, 'art', assetDone); return; }
+                    var im = new Image();
+                    im.onload = function () { oceanSrc = COVER_ART_TRY[i]; hasOceanArt = true; preImgs.art = im; assetDone(); };
+                    im.onerror = function () { i++; tryNext(); };
+                    im.src = COVER_ART_TRY[i];
+                })();
+
+                /* 2~5) 人、闭眼贴片、法线图、遮挡蒙版 */
+                loadImageInto('assets/OldMan-Body.png', 'man', assetDone);
+                loadImageInto('assets/OldManEyes-Closed.png', 'eyes', assetDone);
+                loadImageInto('assets/waternormals.jpg', 'norm', assetDone);
+                loadImageInto('assets/man-mask.png', 'occ', assetDone);
+                /* 6~7) 两条音频由 initCoverAudio(assetDone) 计进度 */
+            }
+
+            function onAllLoaded() {
+                if (loaderPctEl) { loaderPctEl.innerText = '100%'; }
+                if (loaderBarEl) { loaderBarEl.style.width = '100%'; }
+                applyCoverArt(oceanSrc, hasOceanArt);   // 先把画面/着色器备好（加载页还盖着，看不到跳动）
+                playCoverAudio();                       // 试着直接出声（缓入 2s）
+                setTimeout(function () {
+                    if (audioBlocked && !gestureSeen) {
+                        tapPromptShown = true;
+                        if (loaderEl) { loaderEl.className = 'need-tap'; }
+                    } else {
+                        revealCover();
+                    }
+                }, 240);
+            }
+
+            function revealCover() {
+                if (coverRevealed) { return; }
+                coverRevealed = true;
+                if (loaderEl) { loaderEl.className = 'hide'; }
+                deckLocked = false;
+                coverReady = true;
+                applyBodyClass();
+                syncCoverIntro();          // 入场对焦动画 + 声音，从这里开始
+                setTimeout(function () {
+                    if (loaderEl && loaderEl.parentNode) { loaderEl.parentNode.removeChild(loaderEl); }
+                    loaderEl = null;
+                }, 1400);
+            }
+
+            function applyCoverArt(src, hasOcean) {
+                hasOceanArt = hasOcean;
+                var artImg = container.querySelector('.cover-art');
+                var blurImg = container.querySelector('.cover-blur img');
+                var seaPhoto = container.querySelector('.sea-photo');
+                if (artImg) { artImg.src = src; }
+                if (blurImg) { blurImg.src = src; }
+                /* 目录页的水底背景用同一张画（在 JS 里填，缺图时退回纯渐变也不报错） */
+                if (seaPhoto) { seaPhoto.style.backgroundImage = 'url("' + src + '")'; }
+                initCoverWater(preImgs);   // 海面着色器直接用预加载好的图，不重复下载
             }
 
             // 2. 更新页面显示
@@ -964,15 +1633,180 @@
                     }
                 }
                 applyBodyClass();
+                syncCoverIntro();
+                if (currentSlide !== 1) { stopCoverAudio(); }   /* 首页的声音由 syncCoverIntro 统一启动 */
                 pageIndicator.innerText = currentSlide + ' / ' + totalSlides;
             }
 
             /* 首页与尾页是纯画面：body.is-clean 收掉状态栏和触控提示；
-               body.cover-ready 表示原画已经画得出来，标题可以开始升起了 */
+               body.cover-ready 表示原画已经画得出来，入场动画和标题才可以开始 */
             function applyBodyClass() {
                 document.body.className =
                     ((currentSlide === 1 || currentSlide === totalSlides) ? 'is-clean' : '') +
-                    (coverReady ? ' cover-ready' : '');
+                    (coverReady ? ' cover-ready' : '') +
+                    (hasOceanArt ? ' has-ocean' : '');
+            }
+
+            /* ============================================================
+               入场动画控制
+               ------------------------------------------------------------
+               动画只挂在 .intro-run 上，播完立刻摘掉 —— 否则 blur(0) 会留着一个
+               全屏滤镜层，和海面 canvas 叠在一起，老一体机上会掉帧。
+               摘掉后回到基础态（= 动画终帧），画面不跳。
+               ============================================================ */
+            var introEl = container.querySelector('.cover-intro');
+
+            function runCoverIntro() {
+                if (!introEl) { return; }
+                introEl.className = 'cover-intro';
+                /* 强制回流，让“翻走再翻回来”时动画能重新播 */
+                void introEl.offsetWidth;
+                introEl.className = 'cover-intro intro-run';
+            }
+
+            function endCoverIntro() {
+                if (!introEl) { return; }
+                introEl.className = 'cover-intro';
+            }
+
+            /* 只认对焦动画自己的结束事件（内部浪纹/闭眼那些是 infinite，不会触发） */
+            function onIntroAnimationEnd(e) {
+                var name = e && (e.animationName || e.webkitAnimationName);
+                if (name && name !== 'coverFocus') { return; }
+                endCoverIntro();
+            }
+
+            function syncCoverIntro() {
+                if (!introEl) { return; }
+                if (coverReady && currentSlide === 1) {
+                    runCoverIntro();
+                    playCoverAudio();      /* 声音跟画面同时起来，2s 缓入 */
+                } else {
+                    endCoverIntro();
+                }
+            }
+
+            if (introEl) {
+                introEl.addEventListener('animationend', onIntroAnimationEnd, false);
+                introEl.addEventListener('webkitAnimationEnd', onIntroAnimationEnd, false);
+            }
+
+            /* 柔焦块的浮现时间 = 文字第一个词出现的那一刻（TEXT_START + 0.25），
+               在这里注入而不是写死在 CSS 里，免得改 TEXT_START 时两边对不上 */
+            var coverBlurEl = container.querySelector('.cover-blur');
+            if (coverBlurEl) {
+                var veilDelay = (TEXT_START + 0.25).toFixed(2) + 's';
+                coverBlurEl.style.webkitAnimationDelay = veilDelay;
+                coverBlurEl.style.animationDelay = veilDelay;
+            }
+
+            /* ============================================================
+               首页环境音
+               ------------------------------------------------------------
+               画面一出现就开始播，音量 2 秒缓入；离开第一页缓出 0.7s 并停掉，
+               回到第一页重新开始。
+               浏览器可能拦“带声音的自动播放”，两种应对：
+                 1. 若被拦：先静音播起来（静音自动播放一定放行），画面照常对焦，
+                    等第一次点击/按键再取消静音 —— 声音照样是 2s 缓入；
+                 2. 想彻底免掉那次交互，给一体机上的 Chrome 快捷方式加启动参数
+                    --autoplay-policy=no-user-gesture-required
+               ============================================================ */
+            function initCoverAudio(onEachReady) {
+                var i;
+                for (i = 0; i < COVER_AUDIO.length; i++) {
+                    var a;
+                    try { a = new Audio(COVER_AUDIO[i].src); } catch (e) { if (onEachReady) { onEachReady(); } continue; }
+                    a.loop = true;
+                    a.preload = 'auto';
+                    a.volume = 0;
+                    a.__target = COVER_AUDIO[i].vol;
+                    coverAudio.push(a);
+
+                    /* 能播了就算加载完成（算进进度条）；出错或超时也不卡住加载页 */
+                    (function (el, cb) {
+                        var fired = false;
+                        var once = function () {
+                            if (fired) { return; }
+                            fired = true;
+                            if (cb) { cb(); }
+                        };
+                        el.addEventListener('canplay', once, false);
+                        el.addEventListener('error', once, false);
+                        setTimeout(once, 6000);
+                    })(a, onEachReady);
+                }
+            }
+
+            /* 音量渐变：按真实时间推进（setInterval 本身会漂移，用时间戳算比例才准），
+               结束时可选停掉并回到开头 */
+            function fadeAudio(a, to, ms, thenStop) {
+                if (a.__fadeId) { clearInterval(a.__fadeId); a.__fadeId = null; }
+                var from = a.volume, t0 = (new Date()).getTime(), k, v;
+                a.__fadeId = setInterval(function () {
+                    k = ms <= 0 ? 1 : (((new Date()).getTime() - t0) / ms);
+                    if (k > 1) { k = 1; }
+                    v = from + (to - from) * k;
+                    if (v < 0) { v = 0; } else if (v > 1) { v = 1; }
+                    try { a.volume = v; } catch (e) {}
+                    if (k >= 1) {
+                        clearInterval(a.__fadeId);
+                        a.__fadeId = null;
+                        if (thenStop) {
+                            try { a.pause(); a.currentTime = 0; } catch (e) {}
+                        }
+                    }
+                }, 40);
+            }
+
+            function playCoverAudio() {
+                var i;
+                for (i = 0; i < coverAudio.length; i++) { playOne(coverAudio[i]); }
+            }
+
+            function playOne(a) {
+                var failed = false;
+                try {
+                    if (a.paused) { a.currentTime = 0; }
+                    a.muted = false;
+                    var p = a.play();
+                    /* 自动播放被拦（NotAllowedError）：转静音播放 + 等交互 */
+                    if (p && typeof p['catch'] === 'function') {
+                        p['catch'](function () { playOneMuted(a); });
+                    }
+                } catch (e) { failed = true; }
+                if (failed) { playOneMuted(a); return; }
+                fadeAudio(a, a.__target, FADE_IN_MS, false);
+            }
+
+            function playOneMuted(a) {
+                try { a.volume = 0; } catch (e) {}
+                try { a.muted = true; a.play(); } catch (e) {}
+                if (!audioBlocked) {
+                    audioBlocked = true;   // 被别人拦了：交给加载页决定是等一次点击还是直接进
+                }
+                armAudioUnlock();
+            }
+
+            function stopCoverAudio() {
+                var i;
+                for (i = 0; i < coverAudio.length; i++) { fadeAudio(coverAudio[i], 0, FADE_OUT_MS, true); }
+            }
+
+            /* 静音兜底时才需要：用户第一次点击/按键/触摸时取消静音，2s 缓入 */
+            var audioUnlockArmed = false;
+            function armAudioUnlock() {
+                if (audioUnlockArmed) { return; }
+                audioUnlockArmed = true;
+                var handler = function () {
+                    document.removeEventListener('click', handler, false);
+                    document.removeEventListener('keydown', handler, false);
+                    document.removeEventListener('touchstart', handler, false);
+                    audioUnlockArmed = false;
+                    if (currentSlide === 1) { playCoverAudio(); }
+                };
+                document.addEventListener('click', handler, false);
+                document.addEventListener('keydown', handler, false);
+                document.addEventListener('touchstart', handler, false);
             }
 
             // 3. 记录操作日志
@@ -982,7 +1816,7 @@
 
             // 4. 下一页
             function nextSlide() {
-                if (isTransitioning) return;
+                if (deckLocked || isTransitioning) return;   /* 加载页还在时不许翻页 */
                 if (currentSlide < totalSlides) {
                     isTransitioning = true;
                     currentSlide++;
@@ -993,7 +1827,7 @@
 
             // 5. 上一页
             function prevSlide() {
-                if (isTransitioning) return;
+                if (deckLocked || isTransitioning) return;   /* 加载页还在时不许翻页 */
                 if (currentSlide > 1) {
                     isTransitioning = true;
                     currentSlide--;
@@ -1038,6 +1872,12 @@
             document.addEventListener('touchmove', function(e) {
                 e.preventDefault();
             }, { passive: false });
+
+            /* 9. 开场：等上面所有函数/引用都就位，再统一启动一次
+                  （首次 updateSlide 会同步 body 类名、入场动画、声音）
+                  —— 注意入场动画和声音都由 initCoverArt 的回调在“背景图就绪”后触发，
+                     不是在这里，所以不会出现白字先飘在纯黑背景上的情况 */
+            updateSlide();
 
         })();
     </script>
