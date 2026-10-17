@@ -76,31 +76,6 @@
             height: 70%;
         }
 
-        /* ====== 底部状态调试栏 ====== */
-        #status-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #111;
-            border-top: 2px solid #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            box-sizing: border-box;
-            font-size: 18px;
-            z-index: 9999; /* 保证永远在最上层，不被触摸区挡住 */
-        }
-        .status-item {
-            color: #4CAF50; /* 绿色高亮 */
-            font-weight: bold;
-        }
-        .status-warning {
-            color: #FFC107; /* 黄色 */
-        }
-
         /* ====== 最后一页：微弱的晨光 + 一副漂浮的白色鱼骨架 ====== */
         .final-scene {
             position: relative;
@@ -318,16 +293,17 @@
             opacity: 0.09;
             -webkit-filter: blur(2px);
             filter: blur(2px);
-            -webkit-animation: seaCaustics 42s linear infinite;
-            animation: seaCaustics 42s linear infinite;
+            /* 慢漂：200 秒走 22%，约 3px/s —— 太快会显得水在"流"，而不是水底在动 */
+            -webkit-animation: seaCaustics 200s linear infinite;
+            animation: seaCaustics 200s linear infinite;
         }
         @-webkit-keyframes seaCaustics {
             from { -webkit-transform: translate3d(0, 0, 0); }
-            to   { -webkit-transform: translate3d(-46%, 14%, 0); }
+            to   { -webkit-transform: translate3d(-22%, 6%, 0); }
         }
         @keyframes seaCaustics {
             from { transform: translate3d(0, 0, 0); }
-            to   { transform: translate3d(-46%, 14%, 0); }
+            to   { transform: translate3d(-22%, 6%, 0); }
         }
         /* 光柱：从水面斜插下来，缓慢摆 */
         .sea-rays i {
@@ -403,11 +379,6 @@
             color: rgba(186, 232, 245, 0.62);
             margin-bottom: 3.4vh;
             padding-left: 0.34em;
-            opacity: 0;
-        }
-        .slide.active .toc-label {
-            -webkit-animation: tocFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
-            animation: tocFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
         }
         .toc-list {
             list-style: none;
@@ -485,11 +456,304 @@
             text-transform: uppercase;
             color: rgba(186, 232, 245, 0.5);
             padding-left: 2em;
-            opacity: 0;
         }
-        .slide.active .toc-en {
-            -webkit-animation: tocFadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
-            animation: tocFadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+        /* ---- 第 3 页起：章节正文页 ---- */
+        .sec {
+            position: absolute;
+            left: 11vw;
+            right: 11vw;
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            max-width: 68vw;
+            text-align: left;          /* 顶掉全局 p{text-align:center} 的影响 */
+        }
+        .sec-label {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 0.92vw;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: rgba(186, 232, 245, 0.62);
+            padding-left: 0.32em;
+            text-align: left;
+        }
+        .sec-title {
+            margin: 2.2vh 0 0 0;
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-weight: 800;
+            font-size: 3.6vw;
+            line-height: 1.14;
+            letter-spacing: 0.01em;
+            color: #f2f2f2;
+            text-align: left;
+        }
+        /* 标题下面的细线：和目录页一样，从左侧长出来 */
+        .sec-rule {
+            position: relative;
+            height: 1px;
+            margin: 3.1vh 0 3vh 0;
+            background: rgba(186, 232, 245, 0.22);
+            -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+            -webkit-transform-origin: left center;
+            transform-origin: left center;
+        }
+        .slide.active .sec-rule {
+            -webkit-animation: tocLine 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.62s both;
+            animation: tocLine 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.62s both;
+        }
+        .sec-sub {
+            font-family: "MiSans", "MiSans Heavy", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 1.62vw;
+            line-height: 1.4;
+            letter-spacing: 0.01em;
+            color: rgba(134, 224, 242, 0.95);
+            text-align: left;
+        }
+        .sec-body {
+            margin: 3.6vh 0 0 0;
+            max-width: 64vw;            /* 最长一句约 59vw，留 5vw 余量，保证一句一行 */
+            font-family: "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 1.45vw;
+            line-height: 1.95;
+            letter-spacing: 0.01em;
+            color: rgba(230, 241, 246, 0.86);
+            text-align: left;           /* 同上：正文必须左对齐 */
+        }
+        .sec-body .ln { display: block; text-align: left; }
+        /* 正文每行一个遮罩块：按基线对齐（和普通段落一致），行高收小让升起行程不至于太长 */
+        .sec-body .ln .wd {
+            line-height: 1.3;
+            vertical-align: baseline;
+            padding-bottom: 0.12em;
+            margin-bottom: -0.12em;
+        }
+
+        /* ---- 顶部固定标题区：滚动时不动 ----
+           高度按 30vh 预留，下面的 .scroll-page 从 30vh 开始（两处要一起改） */
+        .pin-head {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 9vh 11vw 0 11vw;
+            box-sizing: border-box;
+            text-align: left;
+            pointer-events: none;
+        }
+        .pin-label {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 0.92vw;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: rgba(186, 232, 245, 0.62);
+            padding-left: 0.32em;
+        }
+        .pin-title {
+            margin: 2vh 0 0 0;
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-weight: 800;
+            font-size: 3.2vw;
+            line-height: 1.16;
+            letter-spacing: 0.01em;
+            color: #f2f2f2;
+            max-width: 78vw;
+        }
+        .pin-rule {
+            height: 1px;
+            width: 78vw;
+            margin: 2.4vh 0 2.2vh 0;
+            background: rgba(186, 232, 245, 0.22);
+            -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+            -webkit-transform-origin: left center;
+            transform-origin: left center;
+            -webkit-transition: -webkit-transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+            transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+        }
+        .slide.active .pin-rule {
+            -webkit-transform: scaleX(1);
+            transform: scaleX(1);
+        }
+        /* 蓝色小标题：多条叠在一起，按滚动位置切换显示（同一位置，高度不跳） */
+        .pin-sub {
+            position: relative;
+            height: 2.3vw;
+            font-family: "MiSans Demibold", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 1.5vw;
+            line-height: 1.4;
+            letter-spacing: 0.01em;
+            color: rgba(134, 224, 242, 0.95);
+        }
+        .pin-sub-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            white-space: nowrap;
+            opacity: 0;
+            -webkit-transition: opacity 0.32s ease;
+            transition: opacity 0.32s ease;
+        }
+        .pin-sub-line.on { opacity: 1; }
+        /* 切到这一条时，字再逐个升起一次 */
+        .pin-sub-line.on .sw > i {
+            -webkit-animation: swRise 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
+            animation: swRise 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
+        }
+
+        /* ---- 第 4 页起：纵向滚动的长页 ----
+           每个 .sp-stop 占满一屏，点「下一页」就是平滑滚到下一段的位置；
+           海景底板固定在背后不随滚动走（视差感）。 */
+        .scroll-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .sp-inner { position: relative; }
+        /* 下面压着固定标题区：滚动区从 30vh 起、高 70vh（和 .pin-head 的预留高度对应） */
+        .scroll-page.under-head {
+            top: 30vh;
+            height: 70vh;
+        }
+        /* 正文顶对齐，紧贴在标题下面，不再上下居中留一大片空 */
+        .scroll-page.under-head .sp-stop {
+            min-height: 70vh;
+            padding: 2.4vh 11vw 5vh 11vw;
+            -webkit-justify-content: flex-start;
+            justify-content: flex-start;
+        }
+        /* 没滚到的整屏先整体透明，避免它在视口下沿“露头” */
+        .sp-stop {
+            opacity: 0;
+            -webkit-transition: opacity 0.45s ease;
+            transition: opacity 0.45s ease;
+        }
+        .sp-stop.is-in { opacity: 1; }
+        /* 隐藏原生滚动条（Chrome/Safari 用伪元素，Firefox 用 scrollbar-width） */
+        .scroll-page::-webkit-scrollbar { width: 0; height: 0; }
+        .scroll-page { scrollbar-width: none; -ms-overflow-style: none; }
+        .sp-stop {
+            position: relative;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding: 14vh 11vw;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            -webkit-justify-content: center;
+            justify-content: center;
+            -webkit-align-items: flex-start;
+            align-items: flex-start;
+            text-align: left;
+        }
+        .sp-label {
+            font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+            font-size: 0.92vw;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: rgba(186, 232, 245, 0.62);
+            padding-left: 0.32em;
+        }
+        .sp-title {
+            margin: 2.4vh 0 0 0;
+            font-family: "MiSans Heavy", "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-weight: 800;
+            font-size: 3.25vw;
+            line-height: 1.24;
+            letter-spacing: 0.01em;
+            color: #f2f2f2;
+            max-width: 72vw;
+        }
+        .sp-rule {
+            height: 1px;
+            width: 100%;
+            max-width: 66vw;
+            margin: 3.4vh 0 0 0;
+            background: rgba(186, 232, 245, 0.22);
+            -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+            -webkit-transform-origin: left center;
+            transform-origin: left center;
+            -webkit-transition: -webkit-transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+            transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+        }
+        .sp-stop.is-in .sp-rule {
+            -webkit-transform: scaleX(1);
+            transform: scaleX(1);
+        }
+        .sp-text {
+            margin: 0;
+            max-width: 58vw;
+            font-family: "MiSans", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 1.72vw;
+            line-height: 2.0;
+            letter-spacing: 0.01em;
+            color: rgba(231, 242, 246, 0.88);
+            text-align: left;
+        }
+        .sp-text strong {
+            color: rgba(134, 224, 242, 0.98);
+            font-weight: 800;
+        }
+        /* 滚到的段落才播逐字动画。
+           这里不用「遮罩切字」那套 —— 每个字独立裁切，升起过程中会露出半截字，
+           看着像文字泄露；改成「淡入 + 轻微上浮」，任何一帧都是完整字形。 */
+        .sw {
+            display: inline-block;
+            vertical-align: baseline;
+        }
+        .sw > i {
+            display: inline-block;
+            font-style: normal;
+            opacity: 0;
+            -webkit-transform: translateY(0.5em);
+            transform: translateY(0.5em);
+        }
+        .sp-stop.is-in .sw > i {
+            -webkit-animation: swRise 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+            animation: swRise 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+        }
+        @-webkit-keyframes swRise {
+            from { opacity: 0; -webkit-transform: translateY(0.5em); }
+            to   { opacity: 1; -webkit-transform: translateY(0); }
+        }
+        @keyframes swRise {
+            from { opacity: 0; transform: translateY(0.5em); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        /* 右侧细进度条：告诉讲者下面还有 */
+        .sp-progress {
+            position: absolute;
+            right: 4.2vw;
+            top: 50%;
+            width: 1px;
+            height: 24vh;
+            margin-top: -12vh;
+            background: rgba(186, 232, 245, 0.16);
+            pointer-events: none;
+        }
+        .sp-progress i {
+            display: block;
+            width: 100%;
+            height: 0;
+            background: rgba(186, 232, 245, 0.8);
+            -webkit-transition: height 0.4s ease;
+            transition: height 0.4s ease;
+        }
+
+        /* 占位页的文字也走同一套淡入上浮 */
+        .ph { text-align: center; }
+        .slide.active .ph {
+            -webkit-animation: tocFadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+            animation: tocFadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
         }
 
         /* ====== 第一页：风暴中的老人 ======
@@ -709,6 +973,15 @@
             height: 100%;
         }
         .cover-man { display: none; }
+        /* 退场时老人单独往左让位的那一层（和上面的晃动分开，互不打架） */
+        .cover-man-inner {
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-transition: -webkit-transform 1.1s cubic-bezier(0.55, 0.05, 0.28, 1);
+            transition: transform 1.1s cubic-bezier(0.55, 0.05, 0.28, 1);
+        }
         .cover-man-wrap img.cover-man {
             left: 0;
             top: 0;
@@ -887,8 +1160,31 @@
             to   { transform: translateY(0); }
         }
 
-        /* 封面与尾页：不留状态栏和触控提示 */
-        body.is-clean #status-bar { display: none; }
+        /* ====== 首页 -> 下一页：推进到浪里 ======
+           .cover-zoom 一加上，整幅画朝浪的方向放大，老人往左边让位，
+           标题先淡出；推到位后由 .slide 的 0.4s 透明度过渡完成换页。
+           transform-origin 与 ZOOM_ORIGIN / ZOOM_SCALE 保持一致。 */
+        .cover-intro {
+            -webkit-transition: -webkit-transform 1.1s cubic-bezier(0.55, 0.05, 0.28, 1), -webkit-filter 1.1s ease;
+            transition: transform 1.1s cubic-bezier(0.55, 0.05, 0.28, 1), filter 1.1s ease;
+        }
+        .cover-zoom .cover-intro {
+            -webkit-transform: scale(2.35);
+            transform: scale(2.35);
+            -webkit-transform-origin: 78% 28%;
+            transform-origin: 78% 28%;
+        }
+        .cover-zoom .cover-man-inner {
+            -webkit-transform: translateX(-30%);
+            transform: translateX(-30%);
+        }
+        .cover-title {
+            -webkit-transition: opacity 0.45s ease;
+            transition: opacity 0.45s ease;
+        }
+        .cover-zoom .cover-title { opacity: 0; }
+
+        /* 封面与尾页：不留触控提示 */
         body.is-clean #zone-top { background: none; }
     </style>
 </head>
@@ -914,16 +1210,12 @@
     <div class="touch-zone" id="zone-top"></div>
     <div class="touch-zone" id="zone-bottom"></div>
 
-    <!-- 底部调试状态栏 -->
-    <div id="status-bar">
-        <span>当前页码：<span class="status-item" id="pageIndicator">1 / 20</span></span>
-        <span>最近操作：<span class="status-item status-warning" id="lastAction">等待操作...</span></span>
-    </div>
+    <!-- 底部调试状态栏（已按需求移除） -->
 
     <script>
         // 使用原生 ES5 语法，确保老旧一体机浏览器兼容
         (function() {
-            var totalSlides = 20; // 设定总页数 15~30 均可
+            var totalSlides = 19; // 设定总页数 15~30 均可
             var currentSlide = 1;
             var isTransitioning = false; // 防抖锁
             var coverReady = false;      // 封面原画是否已经可以显示（决定入场/标题何时开始）
@@ -933,13 +1225,21 @@
             var TEXT_START = 2.7;        // 文字动画的整体起始延迟（秒）
 
             /* 首页环境音：两条一起循环混播，离开第一页就停 */
-            var COVER_AUDIO = [
-                { src: 'assets/audio/page1/1436_sea-waves-02.mp3', vol: 0.55 },  // 海浪（23.7s 一循环）
-                { src: 'assets/audio/page1/umblings-of-thunder.mp3', vol: 0.80 } // 远处的雷（215s）
-            ];
+            /* 每一页各自的环境音：进入这一页开始响（循环混播），离开就缓出停掉。
+               要加页就照这里加一组。 */
+            var AUDIO_PAGES = {
+                1: [
+                    { src: 'assets/audio/page1/1436_sea-waves-02.mp3', vol: 0.55 },  // 海浪（23.7s 一循环）
+                    { src: 'assets/audio/page1/umblings-of-thunder.mp3', vol: 0.80 } // 远处的雷（215s）
+                ],
+                2: [
+                    { src: 'assets/audio/Page2/page2-water1.mp3', vol: 0.50 },       // 水底 1（36s）
+                    { src: 'assets/audio/Page2/page2-water2.mp3', vol: 0.50 }        // 水底 2（36.5s）
+                ]
+            };
             var FADE_IN_MS = 2000;       // 画面出现时，声音缓入 2s
-            var FADE_OUT_MS = 700;       // 离开第一页时，缓出 0.7s
-            var coverAudio = [];         // 播放器实例
+            var FADE_OUT_MS = 700;       // 离开这一页时，缓出 0.7s
+            var audioByPage = {};        // 页码 -> [播放器]
 
             /* 首页背景图：优先用「去掉老人、保留船」的那张，
                这样老人可以从背景里拆出来单独晃；文件不在就自动退回原来的 Background.png
@@ -963,8 +1263,6 @@
             var gestureSeen = false, coverRevealed = false, tapPromptShown = false, deckLocked = true;
 
             var container = document.getElementById('slide-container');
-            var pageIndicator = document.getElementById('pageIndicator');
-            var lastAction = document.getElementById('lastAction');
 
             /* ============================================================
                第二页：目录（水底）
@@ -1011,6 +1309,23 @@
                 return out;
             }
 
+            /* 海景底板：第 2 页起的章节页都复用它（深水 + 海底 + 焦散 + 光柱 + 颗粒 + 暗角） */
+            function seaLayersHtml() {
+                return '<div class="sea-deep"></div>' +
+                       '<div class="sea-photo"></div>' +
+                       '<div class="sea-caustics"></div>' +
+                       '<div class="sea-rays">' + buildSeaRays() + '</div>' +
+                       '<div class="sea-motes">' + buildSeaMotes(16) + '</div>' +
+                       '<div class="sea-vignette"></div>';
+            }
+
+            function buildSeaScene(inner, extraClass) {
+                return '<div class="sea-scene' + (extraClass ? ' ' + extraClass : '') + '">' +
+                           seaLayersHtml() +
+                           inner +
+                       '</div>';
+            }
+
             function buildContentsScene() {
                 var rows = '', css = '', i, it, t0, lineDelay;
                 for (i = 0; i < TOC_ITEMS.length; i++) {
@@ -1022,8 +1337,7 @@
                     rows += '<li class="toc-row">' +
                                 '<span class="toc-idx">' + riseChars(it.idx, t0, 0.05) + '</span>' +
                                 '<span class="toc-name">' + riseChars(it.name, t0 + 0.06, 0.05) + '</span>' +
-                                '<span class="toc-en" style="-webkit-animation-delay:' + (t0 + 0.3).toFixed(2) +
-                                    's;animation-delay:' + (t0 + 0.3).toFixed(2) + 's">' + it.en + '</span>' +
+                                '<span class="toc-en">' + riseChars(it.en, t0 + 0.3, 0.016) + '</span>' +
                             '</li>';
                 }
                 /* 最后一条下面的收尾线，跟着最后一行一起长出来 */
@@ -1038,12 +1352,280 @@
                            '<div class="sea-motes">' + buildSeaMotes(16) + '</div>' +
                            '<div class="sea-vignette"></div>' +
                            '<div class="toc">' +
-                               '<div class="toc-label">Contents · 目录</div>' +
+                               '<div class="toc-label">' + riseChars('Contents · 目录', 0.18, 0.02) + '</div>' +
                                '<ul class="toc-list">' + rows + '</ul>' +
                                '<div class="toc-end"></div>' +
                            '</div>' +
                            '<style>' + css + '</style>' +
                        '</div>';
+            }
+
+            /* ============================================================
+               第 3 页起：章节正文页（沿用海景底板）
+               ------------------------------------------------------------
+               结构：小标签 → 大标题（逐字升起）→ 细分割线 → 副标题 → 正文
+                     正文按句拆三行，逐行淡入上浮，讲课时跟着节奏念正好。
+               要加新页：往 SECTIONS 里加一个 key（页码）。正文写成字符串数组。
+               ============================================================ */
+            /* 单屏能放下的短页用它（第 3 页已并入滚动长页，这里暂时留空） */
+            var SECTIONS = {};
+
+            /* ============================================================
+               第 4 页起：纵向滚动的长页
+               ------------------------------------------------------------
+               内容比一屏长时用它：每个 stops 项占满一屏，点「下一页」平滑滚到
+               下一段的位置（最后一段再点就翻到下一页），「上一页」往回滚。
+               文字逐字升起，滚到哪段播哪段。段落里可以有 <strong> 之类的标签。
+               ============================================================ */
+            var SCROLL_SECTIONS = {
+                3: {
+                    label: 'Part One · 一 · 写作背景',
+                    title: '本书写作的社会背景',
+                    /* stops 里可以给每屏一个 sub；不写就沿用上一屏的。
+                       蓝色小标题会随滚动切换到当前这一屏的 sub。 */
+                    stops: [
+                        {
+                            sub: '冷战与麦卡锡主义：外部世界的“窒息感”',
+                            text: '1950年代初，海明威动笔时，美国正深陷冷战对峙与麦卡锡主义的恐怖氛围。从1950年开始，参议员麦卡锡宣称要清查政府中的共产主义活动，社会空气骤然收紧。海明威战后对“美国之梦”已感破灭，个人自由随时受到威胁的感受，与这种政治高压直接相关。'
+                        },
+                        {
+                            sub: '“迷惘的一代”之后：繁荣表象下的精神废墟',
+                            text: '一战之后，海明威和他同代的年轻人因战争创伤而陷入精神上的“迷惘”——他们失去了人生理想与奋斗目标，在痛苦中找不到出路。到了1950年代，美国经济在战后空前繁荣，消费主义席卷社会，但物质的丰裕并未填补精神的空洞。'
+                        },
+                        {
+                            text: '海明威此时本人也正处于人生的低谷：上一部小说《过河入林》被评论界宣判“文才枯竭”。他面对的是一个双重困境——<strong>外部是政治高压，内部是个人创造力与精神信念的危机</strong>。圣地亚哥在绝境中喊出的“一个人可以被毁灭，但不能被打败”，正是在这片精神废墟上立起的一块碑。'
+                        },
+                        /* 4) 存在主义与虚无主义 */
+                        {
+                            sub: '存在主义与虚无主义：战后思潮的底色',
+                            text: '战后欧洲弥漫着一种更为根本的哲学情绪：<strong>虚无主义</strong>。世界似乎不再提供终极意义，人在其中承受着无理由的打击。有论者指出，这种思潮在海明威身处的战后时代开始盛行，而海明威最终的自杀，也与他“无法从虚无主义的泥潭中拔足”有关。'
+                        },
+                        {
+                            text: '但《老人与海》的独特之处在于，它没有停留在虚无之中。它被解读为一部<strong>积极的存在主义小说</strong>：在一个“文明极端暴力和道德混乱的年代”里，圣地亚哥的形象提供了一种面对荒诞的方式——<strong>不指望世界给出回报，但仍然选择行动、选择搏斗、选择在失败中确认自身的尊严</strong>。老人最终只带回一副骨架，这个结局本身就是对“努力必有回报”这一世俗逻辑的拒绝；而他的“不败”，恰恰建立在接受这种“无回报”的前提之上。'
+                        },
+                        /* 5) 古巴：具体的历史地理褶皱 */
+                        {
+                            sub: '古巴：具体的历史地理褶皱',
+                            text: '故事的具体空间是古巴，而1951年的古巴社会本身也处于复杂的张力之中。海明威自1940年代起定居古巴，那里是他的“第二故乡”，但当时古巴社会对美国抱有复杂的敌意与批判情绪，同时西班牙移民的处境也并不轻松。古巴当时还处于巴蒂斯塔独裁统治之下，社会矛盾暗流涌动。'
+                        },
+                        {
+                            text: '海明威将老人设定为一个古巴渔夫，但老人身上又带着西班牙移民的痕迹（他曾用西班牙语称呼大海为“la mar”），这种<strong>身份的多重性与边缘性</strong>，使他天然地处于各种社会结构的缝隙之中。老人的孤独，不仅是海上的孤独，也是一个身处复杂社会边缘的个体所感受到的孤独。'
+                        },
+                        /* 6) 收束：背景如何塑造了“不败”的定义 */
+                        {
+                            sub: '背景如何塑造了“不败”的定义',
+                            text: '把这些线索放在一起看，《老人与海》的社会背景揭示了一个关键事实：<strong>1950年代初的世界，正在系统性地告诉一个人——“你的努力没有终极意义”</strong>。冷战的高压、消费主义的空洞、虚无主义的诱惑，从外部和内部同时瓦解着人的尊严感。'
+                        },
+                        {
+                            text: '海明威让一个一无所有的老人在这样的背景下出海，让他失去一切武器、失去全部鱼肉，最后只带回一副骨架——然后让他说“我没有被打垮”。这句话的力量，恰恰来自它所回应的那个时代：<strong>在一个似乎不再承诺意义的世界里，人依然可以选择以搏斗的姿态存在</strong>。'
+                        }
+                    ]
+                }
+            };
+
+            /* 逐字遮罩块，但用 .sw（由滚动触发），并且：
+               · 不把 <strong> 之类的标签拆开
+               · 标点粘在前一个字块里 —— 每个字都是 inline-block，浏览器不会做行首禁则，
+                 不然「，」「。」可能跑到行首 */
+            var SW_PUNCT = '，。、；：！？）》”’…·％';
+
+            function riseSwHtml(html, t0, step) {
+                var parts = [], buf = '', k = 0,
+                    i = 0, n = html.length, ch, end;
+
+                function flush() {
+                    if (!buf) { return; }
+                    var d = (t0 + k * step).toFixed(3) + 's';
+                    parts.push('<span class="sw"><i style="-webkit-animation-delay:' + d +
+                               ';animation-delay:' + d + '">' + buf + '</i></span>');
+                    k++;
+                    buf = '';
+                }
+
+                while (i < n) {
+                    ch = html.charAt(i);
+                    if (ch === '<') {
+                        end = html.indexOf('>', i);
+                        if (end < 0) { flush(); parts.push(html.substring(i)); break; }
+                        flush();
+                        parts.push(html.substring(i, end + 1));   /* 标签原样输出 */
+                        i = end + 1;
+                        continue;
+                    }
+                    if (SW_PUNCT.indexOf(ch) >= 0 && buf) { buf += ch; i++; continue; }
+                    flush();
+                    buf = (ch === ' ' ? '&nbsp;' : ch);
+                    i++;
+                }
+                flush();
+                return parts.join('');
+            }
+
+            function buildScrollScene(page, cfg) {
+                var stops = '', subs = '', i, st, cur = null, lastSub = cfg.sub || '';
+
+                /* 先算出每一屏生效的小标题（不写就沿用上一屏），变化处生成一条蓝字 */
+                for (i = 0; i < cfg.stops.length; i++) {
+                    st = cfg.stops[i];
+                    cur = (typeof st === 'string' || !st.sub) ? lastSub : st.sub;
+                    if (cur !== lastSub || i === 0) {
+                        if (i === 0 && !cur) { cur = ''; }
+                        subs += '<span class="pin-sub-line' + (i === 0 ? ' on' : '') + '" data-from="' + i + '">' +
+                                    (cur ? riseSwHtml(cur, 0.15, 0.02) : '') +
+                                '</span>';
+                        lastSub = cur;
+                    }
+                }
+
+                /* 顶部固定不动的标题区（蓝字小标题按滚动切换） */
+                var head = '<div class="pin-head">' +
+                               '<div class="pin-label">' + riseChars(cfg.label, 0.10, 0.022) + '</div>' +
+                               '<h2 class="pin-title">' + riseChars(cfg.title, 0.22, 0.045) + '</h2>' +
+                               '<div class="pin-rule"></div>' +
+                               '<div class="pin-sub">' + subs + '</div>' +
+                           '</div>';
+
+                /* 下面每一屏就是一段正文（小标题已经在上面固定区里了） */
+                for (i = 0; i < cfg.stops.length; i++) {
+                    st = cfg.stops[i];
+                    stops += '<section class="sp-stop">' +
+                                 '<p class="sp-text">' +
+                                     riseSwHtml(typeof st === 'string' ? st : st.text, 0.2, 0.012) +
+                                 '</p>' +
+                             '</section>';
+                }
+
+                return buildSeaScene(
+                    head +
+                    '<div class="scroll-page under-head" id="sp' + page + '">' +
+                        '<div class="sp-inner">' + stops + '</div>' +
+                    '</div>' +
+                    '<div class="sp-progress"><i></i></div>'
+                );
+            }
+
+            /* 按当前滚到的屏，切换蓝色小标题 */
+            function updatePinSub(el, idx) {
+                if (!el || !el.parentNode) { return; }
+                var lines = el.parentNode.querySelectorAll('.pin-sub-line'), i,
+                    from, best = null, bestFrom = -1;
+                for (i = 0; i < lines.length; i++) {
+                    from = parseInt(lines[i].getAttribute('data-from'), 10);
+                    if (isNaN(from)) { from = 0; }
+                    if (from <= idx && from > bestFrom) { bestFrom = from; best = lines[i]; }
+                }
+                for (i = 0; i < lines.length; i++) {
+                    if (lines[i] === best) {
+                        if ((' ' + lines[i].className + ' ').indexOf(' on ') < 0) {
+                            lines[i].className = 'pin-sub-line on';   /* 重新加上会重播逐字动画 */
+                        }
+                    } else if ((' ' + lines[i].className + ' ').indexOf(' on ') >= 0) {
+                        lines[i].className = 'pin-sub-line';
+                    }
+                }
+            }
+
+            /* ---- 滚动长页的控制 ---- */
+            function spElOf(page) {
+                return document.getElementById('sp' + page);
+            }
+
+            function spStops(el) {
+                return el ? el.querySelectorAll('.sp-stop') : [];
+            }
+
+            /* 把某一屏标成已出现（顺便按滚动位置更新“当前第几屏”和进度条） */
+            function revealStops(el) {
+                if (!el) { return; }
+                var stops = spStops(el), i, st, idx = 0, maxTop = 0;
+                for (i = 0; i < stops.length; i++) {
+                    st = stops[i];
+                    if (st.offsetTop <= el.scrollTop + el.clientHeight * 0.72) {
+                        if ((' ' + st.className + ' ').indexOf(' is-in ') < 0) {
+                            st.className = st.className + ' is-in';
+                        }
+                    }
+                    if (el.scrollTop + el.clientHeight * 0.5 >= st.offsetTop) { idx = i; }
+                }
+                el.__stopIdx = idx;
+                updatePinSub(el, idx);          /* 蓝色小标题跟着切 */
+                /* 右侧进度条 */
+                var box = el.parentNode ? el.parentNode.querySelector('.sp-progress i') : null;
+                if (box) {
+                    maxTop = el.scrollHeight - el.clientHeight;
+                    box.style.height = (maxTop > 0 ? Math.min(100, 100 * el.scrollTop / maxTop) : 100) + '%';
+                }
+            }
+
+            function smoothScrollTo(el, target, done) {
+                if (!el) { if (done) { done(); } return; }
+                if (el.__timer) { clearInterval(el.__timer); el.__timer = null; }
+                var from = el.scrollTop, dist = target - from,
+                    t0 = (new Date()).getTime(), dur = 700;
+                if (Math.abs(dist) < 2) { if (done) { done(); } return; }
+                el.__timer = setInterval(function () {
+                    var k = ((new Date()).getTime() - t0) / dur;
+                    if (k > 1) { k = 1; }
+                    el.scrollTop = from + dist * (1 - Math.pow(1 - k, 3));   /* easeOutCubic */
+                    revealStops(el);
+                    if (k >= 1) {
+                        clearInterval(el.__timer);
+                        el.__timer = null;
+                        revealStops(el);
+                        if (done) { done(); }
+                    }
+                }, 16);
+            }
+
+            /* 页内往下滚一屏；没有下一屏就返回 false（交给普通翻页） */
+            function scrollNextStop(page) {
+                var el = spElOf(page), stops = spStops(el);
+                if (!el || !stops.length) { return false; }
+                var idx = el.__stopIdx || 0;
+                if (idx >= stops.length - 1) { return false; }
+                isTransitioning = true;
+                smoothScrollTo(el, stops[idx + 1].offsetTop, function () { isTransitioning = false; });
+                return true;
+            }
+
+            /* 页内往上滚一屏；已经在第一屏就返回 false（交给普通翻页） */
+            function scrollPrevStop(page) {
+                var el = spElOf(page), stops = spStops(el);
+                if (!el || !stops.length) { return false; }
+                var idx = el.__stopIdx || 0;
+                if (idx <= 0) { return false; }
+                isTransitioning = true;
+                smoothScrollTo(el, stops[idx - 1].offsetTop, function () { isTransitioning = false; });
+                return true;
+            }
+
+            /* 进入滚动页时回到第一屏，并清掉上一次的 is-in（这样重进会重新播） */
+            function resetScrollPage(page) {
+                var el = spElOf(page), stops = spStops(el), i;
+                if (!el) { return; }
+                for (i = 0; i < stops.length; i++) { stops[i].className = 'sp-stop'; }
+                el.scrollTop = 0;
+                el.__stopIdx = 0;
+                revealStops(el);
+            }
+
+            function buildSectionScene(cfg) {
+                var lines = '', i, t;
+                /* 正文：每句一个块，句内逐字升起；三句再整体错开 */
+                for (i = 0; i < cfg.body.length; i++) {
+                    t = 0.95 + i * 0.30;
+                    lines += '<span class="ln">' + riseChars(cfg.body[i], t, 0.014) + '</span>';
+                }
+                /* 小标签、大标题、副标题：全部逐字 */
+                return buildSeaScene(
+                    '<div class="sec">' +
+                        '<div class="sec-label">' + riseChars(cfg.label, 0.10, 0.022) + '</div>' +
+                        '<h2 class="sec-title">' + riseChars(cfg.title, 0.22, 0.045) + '</h2>' +
+                        '<div class="sec-rule"></div>' +
+                        '<div class="sec-sub">' + riseChars(cfg.sub, 0.62, 0.028) + '</div>' +
+                        '<p class="sec-body">' + lines + '</p>' +
+                    '</div>'
+                );
             }
 
             /* ============================================================
@@ -1221,9 +1803,9 @@
                从下方 110% 升到位，逐词递加 animation-delay —— 文字是“升”上来的，
                不是直接亮出来的。中文按字拆（4 个字，错开大一点才看得出节奏）。
                ============================================================ */
-            function rise(inner, delay) {
+            function rise(inner, delay, cls) {
                 var d = delay.toFixed(3) + 's';
-                return '<span class="wd"><i style="-webkit-animation-delay:' + d +
+                return '<span class="' + (cls || 'wd') + '"><i style="-webkit-animation-delay:' + d +
                        ';animation-delay:' + d + '">' + inner + '</i></span>';
             }
             function riseWords(text, t0, step) {
@@ -1233,9 +1815,14 @@
                 }
                 return out.join(' ');
             }
+            /* 逐字拆成遮罩块。空格换成 &nbsp;，否则每个字都成了 inline-block 后
+               空格会被吃掉（"Part One" 会粘成 "PartOne"）。 */
             function riseChars(text, t0, step) {
-                var out = [], i;
-                for (i = 0; i < text.length; i++) { out.push(rise(text.charAt(i), t0 + i * step)); }
+                var out = [], i, ch;
+                for (i = 0; i < text.length; i++) {
+                    ch = text.charAt(i);
+                    out.push(rise(ch === ' ' ? '&nbsp;' : ch, t0 + i * step));
+                }
                 return out.join('');
             }
 
@@ -1280,8 +1867,10 @@
                                            '<div class="cover-water w-near"><i></i></div>' +
                                        '</div>' +
                                        '<div class="cover-man-wrap">' +
-                                           '<img class="cover-man" src="assets/OldMan-Body.png" alt="">' +
-                                           '<img class="cover-eyes" src="assets/OldManEyes-Closed.png" alt="">' +
+                                           '<div class="cover-man-inner">' +
+                                               '<img class="cover-man" src="assets/OldMan-Body.png" alt="">' +
+                                               '<img class="cover-eyes" src="assets/OldManEyes-Closed.png" alt="">' +
+                                           '</div>' +
                                        '</div>' +
                                        '</div>' +
                                    '</div>' +
@@ -1504,16 +2093,23 @@
                 } else if (i === 2) {
                     /* 目录页：水底环境 + 三个部分 */
                     slide.innerHTML = buildContentsScene();
+                } else if (SCROLL_SECTIONS[i]) {
+                    /* 纵向长页（第 4 页起）：一屏一段，点翻页滚动 */
+                    slide.innerHTML = buildScrollScene(i, SCROLL_SECTIONS[i]);
+                } else if (SECTIONS[i]) {
+                    /* 章节正文页（第 3 页起）：沿用海景底板 */
+                    slide.innerHTML = buildSectionScene(SECTIONS[i]);
                 } else if (i === totalSlides) {
                     /* 最后一页：只有晨光与骨架，没有一个字 */
                     slide.innerHTML = buildFinalScene();
                 } else {
-                    slide.innerHTML = '<h1>第 ' + i + ' 页</h1><p>点击屏幕上方 30% 返回上一页 | 点击下方 70% 进入下一页</p>';
+                    slide.innerHTML = '<div class="ph"><h1>第 ' + i + ' 页</h1>' +
+                                      '<p>点击屏幕上方 30% 返回上一页 | 点击下方 70% 进入下一页</p></div>';
                 }
                 container.appendChild(slide);
                 slides.push(slide);
             }
-            initCoverAudio(assetDone); // 首页环境音：海浪 + 雷声，循环混播（顺带算进加载进度）
+            ensureAudioGroup(1, assetDone); // 首页环境音（海浪 + 雷声）算进加载进度
             initLoader();              // 加载页：预加载 + 进度条；完成后掀开封面
 
             /* ============================================================
@@ -1542,7 +2138,7 @@
             function onLoadGesture() {
                 gestureSeen = true;
                 if (tapPromptShown && !coverRevealed) {
-                    playCoverAudio();   // 在用户手势里播放，浏览器才允许出声
+                    playPageAudio(1);   // 在用户手势里播放，浏览器才允许出声
                     revealCover();
                 }
             }
@@ -1586,7 +2182,7 @@
                 if (loaderPctEl) { loaderPctEl.innerText = '100%'; }
                 if (loaderBarEl) { loaderBarEl.style.width = '100%'; }
                 applyCoverArt(oceanSrc, hasOceanArt);   // 先把画面/着色器备好（加载页还盖着，看不到跳动）
-                playCoverAudio();                       // 试着直接出声（缓入 2s）
+                playPageAudio(1);                       // 试着直接出声（缓入 2s）
                 setTimeout(function () {
                     if (audioBlocked && !gestureSeen) {
                         tapPromptShown = true;
@@ -1609,6 +2205,8 @@
                     if (loaderEl && loaderEl.parentNode) { loaderEl.parentNode.removeChild(loaderEl); }
                     loaderEl = null;
                 }, 1400);
+                /* 后台把第 2 页的水底音也预取好，翻过去就立刻有声 */
+                setTimeout(function () { ensureAudioGroup(2); }, 1500);
             }
 
             function applyCoverArt(src, hasOcean) {
@@ -1634,8 +2232,11 @@
                 }
                 applyBodyClass();
                 syncCoverIntro();
-                if (currentSlide !== 1) { stopCoverAudio(); }   /* 首页的声音由 syncCoverIntro 统一启动 */
-                pageIndicator.innerText = currentSlide + ' / ' + totalSlides;
+                /* 声音按页切换：先停掉别的页，不是首页的立即起播（首页由 syncCoverIntro 起） */
+                stopOtherPageAudio(currentSlide);
+                if (currentSlide !== 1) { playPageAudio(currentSlide); }
+                /* 纵向长页：每次进来都回到第一屏 */
+                if (SCROLL_SECTIONS[currentSlide]) { resetScrollPage(currentSlide); }
             }
 
             /* 首页与尾页是纯画面：body.is-clean 收掉状态栏和触控提示；
@@ -1680,7 +2281,7 @@
                 if (!introEl) { return; }
                 if (coverReady && currentSlide === 1) {
                     runCoverIntro();
-                    playCoverAudio();      /* 声音跟画面同时起来，2s 缓入 */
+                    playPageAudio(1);      /* 声音跟画面同时起来，2s 缓入 */
                 } else {
                     endCoverIntro();
                 }
@@ -1711,30 +2312,34 @@
                  2. 想彻底免掉那次交互，给一体机上的 Chrome 快捷方式加启动参数
                     --autoplay-policy=no-user-gesture-required
                ============================================================ */
-            function initCoverAudio(onEachReady) {
-                var i;
-                for (i = 0; i < COVER_AUDIO.length; i++) {
-                    var a;
-                    try { a = new Audio(COVER_AUDIO[i].src); } catch (e) { if (onEachReady) { onEachReady(); } continue; }
+            /* 按页建播放器（同一页只建一次）；每条就绪时回调一次，供加载页计进度 */
+            function ensureAudioGroup(page, onEachReady) {
+                if (audioByPage[page]) { return audioByPage[page]; }
+                var defs = AUDIO_PAGES[page] || [], list = [], i, a;
+                for (i = 0; i < defs.length; i++) {
+                    try { a = new Audio(defs[i].src); } catch (e) { if (onEachReady) { onEachReady(); } continue; }
                     a.loop = true;
                     a.preload = 'auto';
                     a.volume = 0;
-                    a.__target = COVER_AUDIO[i].vol;
-                    coverAudio.push(a);
-
-                    /* 能播了就算加载完成（算进进度条）；出错或超时也不卡住加载页 */
-                    (function (el, cb) {
-                        var fired = false;
-                        var once = function () {
-                            if (fired) { return; }
-                            fired = true;
-                            if (cb) { cb(); }
-                        };
-                        el.addEventListener('canplay', once, false);
-                        el.addEventListener('error', once, false);
-                        setTimeout(once, 6000);
-                    })(a, onEachReady);
+                    a.__target = defs[i].vol;
+                    list.push(a);
+                    hookAudioReady(a, onEachReady);
                 }
+                audioByPage[page] = list;
+                return list;
+            }
+
+            /* 能播了就算“就绪”（算进进度条）；出错或超时也不卡住加载页 */
+            function hookAudioReady(a, cb) {
+                var fired = false;
+                var once = function () {
+                    if (fired) { return; }
+                    fired = true;
+                    if (cb) { cb(); }
+                };
+                a.addEventListener('canplay', once, false);
+                a.addEventListener('error', once, false);
+                setTimeout(once, 6000);
             }
 
             /* 音量渐变：按真实时间推进（setInterval 本身会漂移，用时间戳算比例才准），
@@ -1758,9 +2363,21 @@
                 }, 40);
             }
 
-            function playCoverAudio() {
-                var i;
-                for (i = 0; i < coverAudio.length; i++) { playOne(coverAudio[i]); }
+            /* 播放某一页的环境音 */
+            function playPageAudio(page) {
+                var list = ensureAudioGroup(page), i;
+                for (i = 0; i < list.length; i++) { playOne(list[i]); }
+            }
+
+            /* 停掉除这一页以外的所有声音 */
+            function stopOtherPageAudio(page) {
+                var k, list, i;
+                for (k in audioByPage) {
+                    if (!audioByPage.hasOwnProperty(k)) { continue; }
+                    if (parseInt(k, 10) === page) { continue; }
+                    list = audioByPage[k];
+                    for (i = 0; i < list.length; i++) { fadeAudio(list[i], 0, FADE_OUT_MS, true); }
+                }
             }
 
             function playOne(a) {
@@ -1787,11 +2404,6 @@
                 armAudioUnlock();
             }
 
-            function stopCoverAudio() {
-                var i;
-                for (i = 0; i < coverAudio.length; i++) { fadeAudio(coverAudio[i], 0, FADE_OUT_MS, true); }
-            }
-
             /* 静音兜底时才需要：用户第一次点击/按键/触摸时取消静音，2s 缓入 */
             var audioUnlockArmed = false;
             function armAudioUnlock() {
@@ -1802,32 +2414,65 @@
                     document.removeEventListener('keydown', handler, false);
                     document.removeEventListener('touchstart', handler, false);
                     audioUnlockArmed = false;
-                    if (currentSlide === 1) { playCoverAudio(); }
+                    playPageAudio(currentSlide);
                 };
                 document.addEventListener('click', handler, false);
                 document.addEventListener('keydown', handler, false);
                 document.addEventListener('touchstart', handler, false);
             }
 
-            // 3. 记录操作日志
-            function logAction(actionText) {
-                lastAction.innerText = actionText;
-            }
-
-            // 4. 下一页
+            // 3. 下一页
             function nextSlide() {
                 if (deckLocked || isTransitioning) return;   /* 加载页还在时不许翻页 */
-                if (currentSlide < totalSlides) {
-                    isTransitioning = true;
+                if (currentSlide >= totalSlides) { return; }
+                /* 纵向长页：先把页内往下滚一屏；已经到底了才真正翻页 */
+                if (scrollNextStop(currentSlide)) { return; }
+                isTransitioning = true;
+                if (currentSlide === 1) {
+                    /* 首页 -> 第 2 页：镜头推进到浪里，再淡入淡出换页 */
+                    zoomOutFromCover();
+                    setTimeout(function () { isTransitioning = false; }, ZOOM_MS + 700);
+                    return;
+                }
+                currentSlide++;
+                updateSlide();
+                setTimeout(function() { isTransitioning = false; }, 400);
+            }
+
+            /* ============================================================
+               首页 -> 下一页的转场
+               ------------------------------------------------------------
+               整幅画面向「右上方那道大浪」推近（放大 2.35 倍，原点 78%/28%），
+               同时老人往左让开 30%，把浪的位置腾出来；推到位后交给 .slide 的
+               0.4s 透明度过渡完成淡入淡出。推近途中标题先淡出。
+               具体数值在 CSS 的 .cover-zoom 里，改的时候两边一起改。
+               ============================================================ */
+            var ZOOM_MS = 1100;          // 推近时长（CSS 里的 1.1s）
+
+            function coverNode() {
+                return container.querySelector('.cover');
+            }
+
+            function zoomOutFromCover() {
+                var cv = coverNode();
+                if (!cv) {
                     currentSlide++;
                     updateSlide();
-                    setTimeout(function() { isTransitioning = false; }, 400);
+                    return;
                 }
+                cv.className = 'cover cover-zoom';
+                setTimeout(function () {
+                    currentSlide++;
+                    updateSlide();                 /* 这里切页：声音也跟着换 */
+                    setTimeout(function () { cv.className = 'cover'; }, 520);  /* 等淡出走完再复原 */
+                }, ZOOM_MS);
             }
 
             // 5. 上一页
             function prevSlide() {
                 if (deckLocked || isTransitioning) return;   /* 加载页还在时不许翻页 */
+                /* 纵向长页：先把页内往上滚一屏；已经在第一屏才真正翻页 */
+                if (scrollPrevStop(currentSlide)) { return; }
                 if (currentSlide > 1) {
                     isTransitioning = true;
                     currentSlide--;
@@ -1843,13 +2488,11 @@
 
                 // 下一页：PageDown, ArrowRight, Space
                 if (key === 'PageDown' || key === 'ArrowRight' || key === ' ' || keyCode === 34 || keyCode === 39 || keyCode === 32) {
-                    logAction('翻页笔/键盘：下一页');
                     nextSlide();
                     event.preventDefault();
                 }
                 // 上一页：PageUp, ArrowLeft
                 else if (key === 'PageUp' || key === 'ArrowLeft' || keyCode === 33 || keyCode === 37) {
-                    logAction('翻页笔/键盘：上一页');
                     prevSlide();
                     event.preventDefault();
                 }
@@ -1858,13 +2501,11 @@
             // 7. 触屏/鼠标点击热区
             // 点击上方 30% -> 上一页
             document.getElementById('zone-top').addEventListener('click', function() {
-                logAction('触屏：点击上方30%（上一页）');
                 prevSlide();
             });
 
             // 点击下方 70% -> 下一页
             document.getElementById('zone-bottom').addEventListener('click', function() {
-                logAction('触屏：点击下方70%（下一页）');
                 nextSlide();
             });
 
@@ -1872,6 +2513,22 @@
             document.addEventListener('touchmove', function(e) {
                 e.preventDefault();
             }, { passive: false });
+
+            /* 纵向长页：滚轮也能推，滚动时同步“哪一屏已出现”和进度条 */
+            document.addEventListener('wheel', function (e) {
+                var el = spElOf(currentSlide);
+                if (!el || deckLocked) { return; }
+                el.scrollTop = el.scrollTop + (e.deltaY || 0);
+                revealStops(el);
+            }, false);
+
+            /* scroll 事件不冒泡，用捕获阶段接住长页容器自己的滚动 */
+            document.addEventListener('scroll', function (e) {
+                var t = e.target;
+                if (t && t.className && (' ' + t.className + ' ').indexOf(' scroll-page ') >= 0) {
+                    revealStops(t);
+                }
+            }, true);
 
             /* 9. 开场：等上面所有函数/引用都就位，再统一启动一次
                   （首次 updateSlide 会同步 body 类名、入场动画、声音）
